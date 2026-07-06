@@ -39,35 +39,36 @@ Le détail des choix et de leurs alternatives est argumenté dans le cahier des 
 
 ## Architecture du dépôt
 
-```
+```bash
 edloc/
 ├── backend/    → API REST Express + Prisma (routes, contrôleurs, services, middlewares, schémas Zod)
 ├── frontend/   → application Next.js (App Router : groupes (public), (bailleur), (admin))
-└── docs/       → les 13 livrables de conception
+└── docs/       → les 13 livrables de conception, classés par phase
 ```
 
-L'organisation détaillée des dossiers est décrite dans `docs/Arborescence_Projet_EDLoc.pdf`.
+L'organisation détaillée des dossiers est décrite dans `docs/conception_technique/Arborescence_Projet_EDLoc.pdf`.
 
 ## Documentation de conception (`docs/`)
 
-| Livrable | Contenu |
-| --- | --- |
-| Cahier des charges | besoin, périmètre, 16 règles de gestion, exigences, architecture, planning |
-| User stories | 20 récits utilisateur avec critères d'acceptation référençant les règles de gestion |
-| Diagramme de cas d'utilisation | 3 acteurs, 14 cas |
-| Diagrammes de séquence | connexion, création + photos, signature + PDF, sortie + comparaison |
-| Diagramme d'activité | cycle de vie complet d'un EDL (couloirs bailleur / système / locataire) |
-| MCD / MLD / MPD + SQL | modèle de données Merise, script PostgreSQL (`edloc_mpd.sql`) |
-| Charte graphique | identité « Chaleureuse & accessible » : palette, typographie, logo, accessibilité |
-| Wireframes | 11 écrans × 3 formats (mobile, tablette, desktop), basse fidélité |
-| Maquettes | 12 écrans haute fidélité appliquant la charte |
-| Arborescence du site & routes API | sitemap 3 zones, 27 routes documentées (accès, user stories) |
-| Arborescence du projet | organisation des dossiers backend / frontend |
-| Conventions de nommage | BDD, API, code TypeScript, Git |
+| Dossier | Livrable | Contenu |
+| --- | --- | --- |
+| `analyse_besoins/` | Cahier des charges | besoin, périmètre, 16 règles de gestion, exigences, architecture, planning |
+| | User stories | 20 récits utilisateur avec critères d'acceptation référençant les règles de gestion |
+| | Diagramme de cas d'utilisation | 3 acteurs, 14 cas |
+| | Diagramme d'activité | cycle de vie complet d'un EDL (couloirs bailleur / système / locataire) |
+| `conception_donnees/` | MCD / MLD / MPD | modèle de données Merise |
+| | edloc_mpd.sql | script PostgreSQL du modèle physique |
+| `conception_fonctionnelle/` | Diagrammes de séquence | connexion, création + photos, signature + PDF, sortie + comparaison |
+| `conception_technique/` | Arborescence du site & routes API | sitemap 3 zones, 27 routes documentées (accès, user stories) |
+| | Arborescence du projet | organisation des dossiers backend / frontend |
+| | Conventions de nommage | BDD, API, code TypeScript, Git |
+| `conception_UI/` | Charte graphique | identité « Chaleureuse & accessible » : palette, typographie, logo, accessibilité |
+| | Wireframes | 11 écrans × 3 formats (mobile, tablette, desktop), basse fidélité |
+| | Maquettes | 12 écrans haute fidélité appliquant la charte |
 
 ## Conventions
 
-Le vocabulaire métier est en **français** de bout en bout : `etat_des_lieux` (table), `/api/etats-des-lieux` (ressource), `EtatDesLieux` (type), `etatDesLieux` (variable). Les commits suivent **Conventional Commits** (`feat:`, `fix:`, `docs:`, …) et les branches `feature/…` / `fix/…`. Détail complet : `docs/Conventions_Nommage_EDLoc.pdf`.
+Le vocabulaire métier est en **français** de bout en bout : `etat_des_lieux` (table), `/api/etats-des-lieux` (ressource), `EtatDesLieux` (type), `etatDesLieux` (variable). Les commits suivent **Conventional Commits** (`feat:`, `fix:`, `docs:`, …) et les branches `feature/…` / `fix/…`. Détail complet : `docs/conception_technique/Conventions_Nommage_EDLoc.pdf`.
 
 ## Démarrage
 
