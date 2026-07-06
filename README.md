@@ -41,12 +41,12 @@ Le détail des choix et de leurs alternatives est argumenté dans le cahier des 
 
 ```
 edloc/
-├── Backend/    → API REST Express + Prisma (routes, contrôleurs, services, middlewares, schémas Zod)
-├── Frontend/   → application Next.js (App Router : groupes (public), (bailleur), (admin))
+├── backend/    → API REST Express + Prisma (routes, contrôleurs, services, middlewares, schémas Zod)
+├── frontend/   → application Next.js (App Router : groupes (public), (bailleur), (admin))
 └── docs/       → les 13 livrables de conception
 ```
 
-L'organisation détaillée des dossiers est décrite dans `docs/Arborescence_Projet_EDLoc.docx`.
+L'organisation détaillée des dossiers est décrite dans `docs/Arborescence_Projet_EDLoc.pdf`.
 
 ## Documentation de conception (`docs/`)
 
@@ -62,21 +62,21 @@ L'organisation détaillée des dossiers est décrite dans `docs/Arborescence_Pro
 | Wireframes | 11 écrans × 3 formats (mobile, tablette, desktop), basse fidélité |
 | Maquettes | 12 écrans haute fidélité appliquant la charte |
 | Arborescence du site & routes API | sitemap 3 zones, 27 routes documentées (accès, user stories) |
-| Arborescence du projet | organisation des dossiers Backend / Frontend |
+| Arborescence du projet | organisation des dossiers backend / frontend |
 | Conventions de nommage | BDD, API, code TypeScript, Git |
 
 ## Conventions
 
-Le vocabulaire métier est en **français** de bout en bout : `etat_des_lieux` (table), `/api/etats-des-lieux` (ressource), `EtatDesLieux` (type), `etatDesLieux` (variable). Les commits suivent **Conventional Commits** (`feat:`, `fix:`, `docs:`, …) et les branches `feature/…` / `fix/…`. Détail complet : `docs/Conventions_Nommage_EDLoc.docx`.
+Le vocabulaire métier est en **français** de bout en bout : `etat_des_lieux` (table), `/api/etats-des-lieux` (ressource), `EtatDesLieux` (type), `etatDesLieux` (variable). Les commits suivent **Conventional Commits** (`feat:`, `fix:`, `docs:`, …) et les branches `feature/…` / `fix/…`. Détail complet : `docs/Conventions_Nommage_EDLoc.pdf`.
 
 ## Démarrage
 
-> 🚧 Cette section sera complétée à l'initialisation du code (Backend puis Frontend). Prérequis prévus : Node.js ≥ 20, PostgreSQL 16, un compte Railway pour le déploiement.
+> 🚧 Cette section sera complétée à l'initialisation du code (backend puis frontend). Prérequis prévus : Node.js ≥ 20, PostgreSQL 16, un compte Railway pour le déploiement.
 
 ## Feuille de route du développement
 
 - [ ] Schéma Prisma (traduction du MPD) + seed du compte administrateur
-- [ ] Initialisation Backend (Express, middlewares JWT / rôles / Zod) et Frontend (Next.js, tokens de la charte)
+- [ ] Initialisation du backend (Express, middlewares JWT / rôles / Zod) et du frontend (Next.js, tokens de la charte)
 - [ ] Authentification (inscription, connexion)
 - [ ] Gestion des biens
 - [ ] États des lieux : création, saisie pièce par pièce, photos horodatées
