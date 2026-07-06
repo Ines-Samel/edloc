@@ -59,7 +59,7 @@ L'organisation détaillée des dossiers est décrite dans `docs/conception_techn
 | `conception_donnees/` | MCD / MLD / MPD | modèle de données Merise |
 | | edloc_mpd.sql | script PostgreSQL du modèle physique |
 | `conception_fonctionnelle/` | Diagrammes de séquence | connexion, création + photos, signature + PDF, sortie + comparaison |
-| `conception_technique/` | Arborescence du site & routes API | sitemap 3 zones, 27 routes documentées (accès, user stories) |
+| `conception_technique/` | Arborescence du site & routes API | sitemap 3 zones, 31 routes documentées (accès, user stories) |
 | | Arborescence du projet | organisation des dossiers backend / frontend |
 | | Conventions de nommage | BDD, API, code TypeScript, Git |
 | `conception_UI/` | Charte graphique | identité « Chaleureuse & accessible » : palette, typographie, logo, accessibilité |
