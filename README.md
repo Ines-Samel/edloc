@@ -95,7 +95,7 @@ Route de santé : `GET /api/health`. Des fichiers de tests HTTP (extension VS Co
 - [x] Initialisation du backend (Express, routeur central, middlewares, gestion globale des erreurs)
 - [x] Authentification (inscription, connexion, détection de session) avec JWT et Argon2id
 - [ ] Initialisation du frontend (Next.js, tokens de la charte)
-- [ ] Gestion des biens
+- [x] Gestion des biens
 - [ ] États des lieux : création, saisie pièce par pièce, photos horodatées
 - [ ] Double signature, verrouillage, génération et envoi du PDF
 - [ ] Comparaison entrée / sortie
