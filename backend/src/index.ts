@@ -2,10 +2,12 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { prisma } from './lib/prisma';
+import { authRoutes } from './routes/auth.routes';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/api/auth', authRoutes);
 
 app.get('/api/sante', async (_req, res) => {
   try {
