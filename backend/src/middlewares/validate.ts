@@ -18,3 +18,21 @@ export function valider(schema: ZodSchema) {
     next();
   };
 }
+
+export function validerQuery(schema: ZodSchema) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const resultat = schema.safeParse(req.query);
+
+    if (!resultat.success) {
+      const details = resultat.error.issues.map((issue) => ({
+        champ: issue.path.join('.'),
+        message: issue.message,
+      }));
+      res.status(400).json({ erreur: 'Paramètres invalides', details });
+      return;
+    }
+
+    res.locals.query = resultat.data;
+    next();
+  };
+}
