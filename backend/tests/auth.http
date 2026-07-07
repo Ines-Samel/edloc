@@ -1,0 +1,69 @@
+@baseUrl = http://localhost:4000/api
+
+### 1. Inscription → attendu 201, sans mot de passe ni hash dans la réponse
+POST {{baseUrl}}/auth/inscription
+Content-Type: application/json
+
+{
+  "nom": "Test",
+  "prenom": "Camille",
+  "email": "camille@test.fr",
+  "motDePasse": "MotDePasseTest12"
+}
+
+### 2. Même e-mail (relancer le 1 revient au même) → attendu 400 "L'inscription a échoué"
+POST {{baseUrl}}/auth/inscription
+Content-Type: application/json
+
+{
+  "nom": "Test",
+  "prenom": "Camille",
+  "email": "camille@test.fr",
+  "motDePasse": "MotDePasseTest12"
+}
+
+### 3. Mot de passe de 11 caractères → attendu 400 "Données invalides" + détail du champ
+POST {{baseUrl}}/auth/inscription
+Content-Type: application/json
+
+{
+  "nom": "Test",
+  "prenom": "Léo",
+  "email": "leo@test.fr",
+  "motDePasse": "OnzeCaracte"
+}
+
+### 4. Connexion bailleur → attendu 200 { jeton, role: "bailleur" }
+# @name connexionBailleur
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{
+  "email": "camille@test.fr",
+  "motDePasse": "MotDePasseTest12"
+}
+
+### 5. Mauvais mot de passe → attendu 401 "Identifiants invalides"
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{
+  "email": "camille@test.fr",
+  "motDePasse": "MauvaisMotDePasse1"
+}
+
+### 6. Connexion administrateur (lit ton .env) → attendu 200 { jeton, role: "administrateur" }
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{
+  "email": "{{$dotenv ADMIN_EMAIL}}",
+  "motDePasse": "{{$dotenv ADMIN_PASSWORD}}"
+}
+
+### 7a. Profil avec le jeton du test 4 → attendu 200 { id, nom, prenom, email, role }
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{connexionBailleur.response.body.jeton}}
+
+### 7b. Profil sans jeton → attendu 401 "Authentification requise"
+GET {{baseUrl}}/auth/me
