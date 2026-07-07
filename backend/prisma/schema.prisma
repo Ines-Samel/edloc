@@ -1,13 +1,146 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum TypeEdl {
+  entree
+  sortie
+
+  @@map("type_edl_enum")
+}
+
+enum StatutEdl {
+  brouillon
+  signe
+
+  @@map("statut_edl_enum")
+}
+
+enum EtatElement {
+  neuf
+  bonEtat      @map("bon_etat")
+  etatUsage    @map("etat_usage")
+  mauvaisEtat  @map("mauvais_etat")
+
+  @@map("etat_element_enum")
+}
+
+enum RoleSignataire {
+  bailleur
+  locataire
+
+  @@map("role_signataire_enum")
+}
+
+model Bailleur {
+  idBailleur      String   @id @default(dbgenerated("gen_random_uuid()")) @map("id_bailleur") @db.Uuid
+  nom             String   @db.VarChar(100)
+  prenom          String   @db.VarChar(100)
+  email           String   @unique @db.VarChar(255)
+  motDePasseHashe String   @map("mot_de_passe_hashe") @db.VarChar(255)
+  telephone       String?  @db.VarChar(20)
+  dateCreation    DateTime @default(now()) @map("date_creation") @db.Timestamp(6)
+  biens           Bien[]
+
+  @@map("bailleur")
+}
+
+model Bien {
+  idBien       String        @id @default(dbgenerated("gen_random_uuid()")) @map("id_bien") @db.Uuid
+  adresse      String        @db.VarChar(255)
+  codePostal   String        @map("code_postal") @db.VarChar(10)
+  ville        String        @db.VarChar(100)
+  typeLogement String        @map("type_logement") @db.VarChar(50)
+  nombrePieces Int?          @map("nombre_pieces") @db.SmallInt
+  surface      Decimal?      @db.Decimal(6, 2)
+  idBailleur   String        @map("id_bailleur") @db.Uuid
+  bailleur     Bailleur      @relation(fields: [idBailleur], references: [idBailleur], onDelete: Cascade, map: "fk_bien_bailleur")
+  etatsDesLieux EtatDesLieux[]
+
+  @@map("bien")
+}
+
+model Locataire {
+  idLocataire   String         @id @default(dbgenerated("gen_random_uuid()")) @map("id_locataire") @db.Uuid
+  nom           String         @db.VarChar(100)
+  prenom        String         @db.VarChar(100)
+  email         String?        @unique @db.VarChar(255)
+  telephone     String?        @db.VarChar(20)
+  etatsDesLieux EtatDesLieux[]
+
+  @@map("locataire")
+}
+
+model EtatDesLieux {
+  idEdl         String      @id @default(dbgenerated("gen_random_uuid()")) @map("id_edl") @db.Uuid
+  typeEdl       TypeEdl     @map("type_edl")
+  dateEdl       DateTime    @default(dbgenerated("CURRENT_DATE")) @map("date_edl") @db.Date
+  statut        StatutEdl   @default(brouillon)
+  dateSignature DateTime?   @map("date_signature") @db.Timestamp(6)
+  idBien        String      @map("id_bien") @db.Uuid
+  idLocataire   String      @map("id_locataire") @db.Uuid
+  bien          Bien        @relation(fields: [idBien], references: [idBien], onDelete: Cascade, map: "fk_edl_bien")
+  locataire     Locataire   @relation(fields: [idLocataire], references: [idLocataire], map: "fk_edl_locataire")
+  pieces        Piece[]
+  signatures    Signature[]
+
+  @@map("etat_des_lieux")
+}
+
+model Piece {
+  idPiece  String       @id @default(dbgenerated("gen_random_uuid()")) @map("id_piece") @db.Uuid
+  libelle  String       @db.VarChar(100)
+  ordre    Int?         @db.SmallInt
+  idEdl    String       @map("id_edl") @db.Uuid
+  etatDesLieux EtatDesLieux @relation(fields: [idEdl], references: [idEdl], onDelete: Cascade, map: "fk_piece_edl")
+  elements Element[]
+
+  @@map("piece")
+}
+
+model Element {
+  idElement   String      @id @default(dbgenerated("gen_random_uuid()")) @map("id_element") @db.Uuid
+  libelle     String      @db.VarChar(100)
+  etat        EtatElement
+  commentaire String?
+  idPiece     String      @map("id_piece") @db.Uuid
+  piece       Piece       @relation(fields: [idPiece], references: [idPiece], onDelete: Cascade, map: "fk_element_piece")
+  photos      Photo[]
+
+  @@map("element")
+}
+
+model Photo {
+  idPhoto        String   @id @default(dbgenerated("gen_random_uuid()")) @map("id_photo") @db.Uuid
+  chemin         String   @db.VarChar(255)
+  dateHorodatage DateTime @default(now()) @map("date_horodatage") @db.Timestamp(6)
+  idElement      String   @map("id_element") @db.Uuid
+  element        Element  @relation(fields: [idElement], references: [idElement], onDelete: Cascade, map: "fk_photo_element")
+
+  @@map("photo")
+}
+
+model Signature {
+  idSignature       String         @id @default(dbgenerated("gen_random_uuid()")) @map("id_signature") @db.Uuid
+  roleSignataire    RoleSignataire @map("role_signataire")
+  dateSignature     DateTime       @default(now()) @map("date_signature") @db.Timestamp(6)
+  donneesSignature  String         @map("donnees_signature")
+  idEdl             String         @map("id_edl") @db.Uuid
+  etatDesLieux      EtatDesLieux   @relation(fields: [idEdl], references: [idEdl], onDelete: Cascade, map: "fk_signature_edl")
+
+  @@unique([idEdl, roleSignataire], map: "uq_signature_role")
+  @@map("signature")
+}
+
+model Administrateur {
+  idAdministrateur String   @id @default(dbgenerated("gen_random_uuid()")) @map("id_administrateur") @db.Uuid
+  email            String   @unique @db.VarChar(255)
+  motDePasseHashe  String   @map("mot_de_passe_hashe") @db.VarChar(255)
+  dateCreation     DateTime @default(now()) @map("date_creation") @db.Timestamp(6)
+
+  @@map("administrateur")
 }
