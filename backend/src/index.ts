@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { prisma } from './lib/prisma';
-import { authRoutes } from './routes/auth.routes';
+import { appRoutes } from './routes/app.routes';
 import { ressourceIntrouvable, gestionErreurs } from './middlewares/erreurs';
 
 // Création de l'application Express
@@ -10,16 +10,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Routes pour l'authentification
-app.use('/api/auth', authRoutes);
+app.use('/api', appRoutes);
 
 // Route de santé pour vérifier la disponibilité de l'API et de la base de données
-app.get('/api/sante', async (_req, res) => {
+app.get('/api/health', async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    res.json({ statut: 'ok', baseDeDonnees: 'ok' });
+    res.json({ status: 'ok', database: 'ok' });
   } catch {
-    res.status(503).json({ statut: 'ok', baseDeDonnees: 'erreur' });
+    res.status(503).json({ status: 'ok', database: 'error' });
   }
 });
 
