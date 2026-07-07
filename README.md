@@ -39,7 +39,7 @@ Le détail des choix et de leurs alternatives est argumenté dans le cahier des 
 
 ## Architecture du dépôt
 
-```bash
+```
 edloc/
 ├── backend/    → API REST Express + Prisma (routes, contrôleurs, services, middlewares, schémas Zod)
 ├── frontend/   → application Next.js (App Router : groupes (public), (bailleur), (admin))
@@ -72,13 +72,29 @@ Le vocabulaire métier est en **français** de bout en bout : `etat_des_lieux` (
 
 ## Démarrage
 
-> 🚧 Cette section sera complétée à l'initialisation du code (backend puis frontend). Prérequis prévus : Node.js ≥ 20, PostgreSQL 16, un compte Railway pour le déploiement.
+### Backend (API)
+
+Prérequis : Node.js ≥ 20 et PostgreSQL 16 (avec une base `edloc` créée).
+
+```bash
+cd backend
+npm install              # dépendances + génération du client Prisma
+cp .env.example .env     # puis renseigner les valeurs (base, JWT_SECRET, compte admin)
+npx prisma migrate dev   # crée les tables
+npx prisma db seed       # crée le compte administrateur
+npm run dev              # démarre l'API sur http://localhost:4000
+```
+
+Route de santé : `GET /api/health`. Des fichiers de tests HTTP (extension VS Code REST Client) sont fournis dans `backend/tests/`.
+
+> 🚧 Le frontend (Next.js) sera initialisé avec les premiers écrans.
 
 ## Feuille de route du développement
 
-- [ ] Schéma Prisma (traduction du MPD) + seed du compte administrateur
-- [ ] Initialisation du backend (Express, middlewares JWT / rôles / Zod) et du frontend (Next.js, tokens de la charte)
-- [ ] Authentification (inscription, connexion)
+- [x] Schéma Prisma (traduction du MPD) + seed du compte administrateur
+- [x] Initialisation du backend (Express, routeur central, middlewares, gestion globale des erreurs)
+- [x] Authentification (inscription, connexion, détection de session) avec JWT et Argon2id
+- [ ] Initialisation du frontend (Next.js, tokens de la charte)
 - [ ] Gestion des biens
 - [ ] États des lieux : création, saisie pièce par pièce, photos horodatées
 - [ ] Double signature, verrouillage, génération et envoi du PDF
