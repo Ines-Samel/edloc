@@ -1,0 +1,48 @@
+@baseUrl = http://localhost:4000/api
+
+### 0. Connexion
+# @name connexion
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{ "email": "camille@test.fr", "motDePasse": "MotDePasseTest12" }
+
+### 1. Upload sur un élément (colle un idElement d'un EDL en brouillon) → attendu 201
+# @name photo
+POST {{baseUrl}}/elements/598a46df-abf6-439c-8fea-92efafec79cb/photos
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: multipart/form-data; boundary=----LimiteEDLoc
+
+------LimiteEDLoc
+Content-Disposition: form-data; name="photo"; filename="photo-test.jpg"
+Content-Type: image/jpeg
+
+< ./fixtures/photo-test.jpg
+------LimiteEDLoc--
+
+### 2. Récupération du fichier → attendu 200, l'image s'affiche dans l'onglet de réponse
+GET {{baseUrl}}/photos/{{photo.response.body.idPhoto}}/fichier
+Authorization: Bearer {{connexion.response.body.jeton}}
+
+### 3. Mauvais format (renomme un .txt en champ photo) → attendu 400
+POST {{baseUrl}}/elements/598a46df-abf6-439c-8fea-92efafec79cb/photos
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: multipart/form-data; boundary=----LimiteEDLoc
+
+------LimiteEDLoc
+Content-Disposition: form-data; name="photo"; filename="pasunephoto.txt"
+Content-Type: text/plain
+
+ceci n'est pas une image
+------LimiteEDLoc--
+
+### 4. Sans fichier → attendu 400 "Aucun fichier fourni"
+POST {{baseUrl}}/elements/598a46df-abf6-439c-8fea-92efafec79cb/photos
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: multipart/form-data; boundary=----LimiteEDLoc
+
+------LimiteEDLoc--
+
+### 5. Suppression → attendu 204 (puis rejouer le 2 → 404)
+DELETE {{baseUrl}}/photos/{{photo.response.body.idPhoto}}
+Authorization: Bearer {{connexion.response.body.jeton}}
