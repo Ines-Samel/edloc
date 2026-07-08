@@ -1,0 +1,50 @@
+@baseUrl = http://localhost:4000/api
+
+### 0. Connexion
+# @name connexion
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{ "email": "camille@test.fr", "motDePasse": "MotDePasseTest12" }
+
+### 1. Bien support
+# @name bien
+POST {{baseUrl}}/biens
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "adresse": "5 rue du Test EDL", "codePostal": "69001", "ville": "Lyon", "typeLogement": "Appartement" }
+
+### 2. Création EDL d'entrée → attendu 201, statut "brouillon", locataire créé
+# @name entree
+POST {{baseUrl}}/etats-des-lieux
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "idBien": "{{bien.response.body.idBien}}", "typeEdl": "entree", "locataire": { "nom": "Durand", "prenom": "Alex", "email": "alex.durand@test.fr" } }
+
+### 3. Sortie sans entrée signée → attendu 422 avec le message dédié
+POST {{baseUrl}}/etats-des-lieux
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "idBien": "{{bien.response.body.idBien}}", "typeEdl": "sortie", "locataire": { "nom": "Durand", "prenom": "Alex", "email": "alex.durand@test.fr" } }
+
+### 4. Consultation complète → attendu 200 : bien, locataire, pieces [], signatures []
+GET {{baseUrl}}/etats-des-lieux/{{entree.response.body.idEdl}}
+Authorization: Bearer {{connexion.response.body.jeton}}
+
+### 5. PATCH de la date → attendu 200
+PATCH {{baseUrl}}/etats-des-lieux/{{entree.response.body.idEdl}}
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "dateEdl": "2026-07-01" }
+
+### 6. Historique du bien → attendu 200, l'EDL d'entrée y figure
+GET {{baseUrl}}/biens/{{bien.response.body.idBien}}/etats-des-lieux
+Authorization: Bearer {{connexion.response.body.jeton}}
+
+### 7. UUID inconnu → attendu 404
+GET {{baseUrl}}/etats-des-lieux/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{connexion.response.body.jeton}}
