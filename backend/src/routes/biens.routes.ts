@@ -9,6 +9,7 @@ import {
   modifier,
   supprimer,
 } from '../controllers/biens.controller';
+import { listerParBien } from '../controllers/etats-des-lieux.controller';
 
 export const biensRoutes = Router();
 
@@ -19,3 +20,4 @@ biensRoutes.post('/', valider(bienSchema), creer);
 biensRoutes.get('/:id', obtenir);
 biensRoutes.put('/:id', valider(bienSchema), modifier);
 biensRoutes.delete('/:id', supprimer);
+biensRoutes.get('/:id/etats-des-lieux', listerParBien);

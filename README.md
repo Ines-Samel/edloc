@@ -39,7 +39,7 @@ Le détail des choix et de leurs alternatives est argumenté dans le cahier des 
 
 ## Architecture du dépôt
 
-```
+```bash
 edloc/
 ├── backend/    → API REST Express + Prisma (routes, contrôleurs, services, middlewares, schémas Zod)
 ├── frontend/   → application Next.js (App Router : groupes (public), (bailleur), (admin))
