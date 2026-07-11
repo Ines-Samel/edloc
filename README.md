@@ -59,7 +59,7 @@ L'organisation détaillée des dossiers est décrite dans `docs/conception_techn
 | `conception_donnees/` | MCD / MLD / MPD | modèle de données Merise |
 | | edloc_mpd.sql | script PostgreSQL du modèle physique |
 | `conception_fonctionnelle/` | Diagrammes de séquence | connexion, création + photos, signature + PDF, sortie + comparaison |
-| `conception_technique/` | Arborescence du site & routes API | sitemap 3 zones, 32 routes documentées (accès, user stories) |
+| `conception_technique/` | Arborescence du site & routes API | sitemap 3 zones, 33 routes documentées (accès, user stories) |
 | | Arborescence du projet | organisation des dossiers backend / frontend |
 | | Conventions de nommage | BDD, API, code TypeScript, Git |
 | `conception_UI/` | Charte graphique | identité « Chaleureuse & accessible » : palette, typographie, logo, accessibilité |
@@ -97,7 +97,7 @@ Route de santé : `GET /api/health`. Des fichiers de tests HTTP (extension VS Co
 - [ ] Initialisation du frontend (Next.js, tokens de la charte)
 - [ ] Gestion des biens
 - [x] États des lieux : création, saisie pièce par pièce, photos horodatées (stockage objet R2)
-- [ ] Double signature, verrouillage, génération et envoi du PDF
+- [x] Double signature, verrouillage, génération et envoi du PDF (pdfkit, e-mails Brevo)
 - [ ] Comparaison entrée / sortie
 - [ ] Écran d'administration
 - [ ] Tests, accessibilité, déploiement Railway
