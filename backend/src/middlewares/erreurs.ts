@@ -16,8 +16,8 @@ export function gestionErreurs(err: unknown, _req: Request, res: Response, _next
     res.status(400).json({ erreur: 'La photo dépasse la taille maximale de 10 Mo' });
     return;
   }
-  if (err instanceof Error && err.message === 'Format de photo non pris en charge (JPEG, PNG ou WebP)') {
-    res.status(400).json({ erreur: 'Format de photo non pris en charge (JPEG, PNG ou WebP)' });
+  if (err instanceof Error && err.message === 'Format de photo non pris en charge (JPEG ou PNG)') {
+    res.status(400).json({ erreur: 'Format de photo non pris en charge (JPEG ou PNG)' });
     return;
   }
   console.error(err);

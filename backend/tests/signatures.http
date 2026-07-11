@@ -1,0 +1,59 @@
+@baseUrl = http://localhost:4000/api
+@idEdl = 3abde682-5f5f-4262-81b7-b0e35b063eff
+
+### 0. Connexion
+# @name connexion
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{ "email": "camille@test.fr", "motDePasse": "MotDePasseTest12" }
+
+### 1. Signature du bailleur → attendu 201, "verrouille": false
+POST {{baseUrl}}/etats-des-lieux/{{idEdl}}/signatures
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "roleSignataire": "bailleur", "donneesSignature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" }
+
+### 2. Le bailleur re-signe → attendu 409 "Ce rôle a déjà signé"
+POST {{baseUrl}}/etats-des-lieux/{{idEdl}}/signatures
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "roleSignataire": "bailleur", "donneesSignature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" }
+
+### 3. Signature du locataire → attendu 201, "verrouille": true
+POST {{baseUrl}}/etats-des-lieux/{{idEdl}}/signatures
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "roleSignataire": "locataire", "donneesSignature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" }
+
+### 4. L'EDL est verrouillé : PATCH → attendu 409
+PATCH {{baseUrl}}/etats-des-lieux/{{idEdl}}
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "dateEdl": "2026-07-08" }
+
+### 5. Ajout de pièce sur EDL verrouillé → attendu 409
+POST {{baseUrl}}/etats-des-lieux/{{idEdl}}/pieces
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "libelle": "Tentative" }
+
+### 6. Téléchargement du PDF → attendu 200, Content-Type application/pdf
+GET {{baseUrl}}/etats-des-lieux/{{idEdl}}/pdf
+Authorization: Bearer {{connexion.response.body.jeton}}
+
+### 7. EDL vide : crée un EDL neuf (sans pièce), colle son id, signe → attendu 422
+POST {{baseUrl}}/etats-des-lieux/3981dab2-c255-4e8d-ba3a-d40e561dc82d/signatures
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "roleSignataire": "bailleur", "donneesSignature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5CYII=" }
+
+### 8. PDF d'un EDL non signé → attendu 409 "pas encore signé"
+GET {{baseUrl}}/etats-des-lieux/3981dab2-c255-4e8d-ba3a-d40e561dc82d/pdf
+Authorization: Bearer {{connexion.response.body.jeton}}
