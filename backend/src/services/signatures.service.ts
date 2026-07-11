@@ -4,6 +4,7 @@ import { prisma } from '../lib/prisma';
 import { s3, S3_BUCKET } from '../lib/s3';
 import { SignatureInput } from '../schemas/signatures.schema';
 import { genererEtStockerPdf } from './pdf.service';
+import { envoyerPdfSigne } from './emails.service';
 
 export async function signer(idBailleur: string, idEdl: string, donnees: SignatureInput) {
   const edl = await prisma.etatDesLieux.findFirst({
@@ -46,8 +47,9 @@ export async function signer(idBailleur: string, idEdl: string, donnees: Signatu
 
   try {
     await genererEtStockerPdf(idEdl);
+    await envoyerPdfSigne(idEdl);
   } catch (err) {
-    console.error('Erreur génération PDF :', err);
+    console.error('Erreur génération PDF ou envoi e-mail :', err);
   }
 
   return { type: 'ok' as const, verrouille: true, signature };
@@ -73,4 +75,15 @@ export async function recupererPdf(idBailleur: string, idEdl: string) {
     }
     throw err;
   }
+}
+
+export async function renvoyerPdf(idBailleur: string, idEdl: string) {
+  const edl = await prisma.etatDesLieux.findFirst({
+    where: { idEdl, bien: { idBailleur } },
+  });
+  if (!edl) return { type: 'introuvable' as const };
+  if (edl.statut !== 'signe') return { type: 'nonSigne' as const };
+
+  const destinataires = await envoyerPdfSigne(idEdl);
+  return { type: 'ok' as const, destinataires };
 }

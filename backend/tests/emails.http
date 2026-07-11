@@ -1,0 +1,68 @@
+@baseUrl = http://localhost:4000/api
+
+### 0a. Inscription du bailleur à vraie adresse (à ne lancer qu'une fois — 400 ensuite, normal)
+POST {{baseUrl}}/auth/inscription
+Content-Type: application/json
+
+{ "nom": "Samel", "prenom": "Inès", "email": "samel.nines@gmail.com", "motDePasse": "UnMotDePasseDeTest12" }
+
+### 0b. Connexion
+# @name connexion
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{ "email": "samel.nines@gmail.com", "motDePasse": "UnMotDePasseDeTest12" }
+
+### 1. Bien support
+# @name bien
+POST {{baseUrl}}/biens
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "adresse": "8 rue du Test Email", "codePostal": "69002", "ville": "Lyon", "typeLogement": "Appartement" }
+
+### 2. EDL d'entrée (locataire à vraie adresse aussi — 2e boîte à toi, ou la même)
+# @name edl
+POST {{baseUrl}}/etats-des-lieux
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "idBien": "{{bien.response.body.idBien}}", "typeEdl": "entree", "locataire": { "nom": "Locataire", "prenom": "Test", "email": "ines.samel@gmx.com" } }
+
+### 3. Une pièce
+# @name piece
+POST {{baseUrl}}/etats-des-lieux/{{edl.response.body.idEdl}}/pieces
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "libelle": "Salon" }
+
+### 4. Un élément
+POST {{baseUrl}}/pieces/{{piece.response.body.idPiece}}/elements
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "libelle": "Mur principal", "etat": "bonEtat" }
+
+### 5. Signature du bailleur → attendu 201, "verrouille": false
+POST {{baseUrl}}/etats-des-lieux/{{edl.response.body.idEdl}}/signatures
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "roleSignataire": "bailleur", "donneesSignature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" }
+
+### 6. Signature du locataire → attendu 201, "verrouille": true — ✉️ L'E-MAIL PART ICI
+POST {{baseUrl}}/etats-des-lieux/{{edl.response.body.idEdl}}/signatures
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "roleSignataire": "locataire", "donneesSignature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" }
+
+### 7. Renvoi du PDF → attendu 200 + destinataires — ✉️ deuxième e-mail
+POST {{baseUrl}}/etats-des-lieux/{{edl.response.body.idEdl}}/envoi-pdf
+Authorization: Bearer {{connexion.response.body.jeton}}
+
+### 8. Renvoi sur un EDL en brouillon → attendu 409 "pas encore signé"
+### (crée un second EDL sans le signer, ou colle l'id d'un brouillon existant)
+POST {{baseUrl}}/etats-des-lieux/3981dab2-c255-4e8d-ba3a-d40e561dc82d/envoi-pdf
+Authorization: Bearer {{connexion.response.body.jeton}}
