@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { signer, recupererPdf } from '../services/signatures.service';
+import { signer, recupererPdf, renvoyerPdf } from '../services/signatures.service';
 import { SignatureInput } from '../schemas/signatures.schema';
 
 function estUUID(id: string): boolean {
@@ -58,4 +58,24 @@ export async function telechargerPdf(req: Request, res: Response): Promise<void>
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', 'inline; filename="etat-des-lieux.pdf"');
   resultat.flux.pipe(res);
+}
+
+export async function renvoyer(req: Request, res: Response): Promise<void> {
+  const id = req.params.id as string;
+  if (!estUUID(id)) {
+    res.status(404).json({ erreur: 'Ressource introuvable' });
+    return;
+  }
+  const idBailleur = req.utilisateur!.sub;
+  const resultat = await renvoyerPdf(idBailleur, id);
+
+  if (resultat.type === 'introuvable') {
+    res.status(404).json({ erreur: 'Ressource introuvable' });
+    return;
+  }
+  if (resultat.type === 'nonSigne') {
+    res.status(409).json({ erreur: "Cet état des lieux n'est pas encore signé" });
+    return;
+  }
+  res.status(200).json({ message: 'PDF envoyé', destinataires: resultat.destinataires });
 }
