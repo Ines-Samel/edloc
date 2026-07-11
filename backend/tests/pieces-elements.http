@@ -1,0 +1,65 @@
+@baseUrl = http://localhost:4000/api
+
+### 0. Connexion
+# @name connexion
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{ "email": "camille@test.fr", "motDePasse": "MotDePasseTest12" }
+
+### 1. EDL support (réutilise un bien existant via tests/biens ou crée-en un)
+# @name edl
+POST {{baseUrl}}/etats-des-lieux
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "idBien": "0581b1a1-a4ac-48ab-b684-dec40f18bf6e", "typeEdl": "entree", "locataire": { "nom": "Martin", "prenom": "Jo", "email": "jo.martin@test.fr" } }
+
+### 2. Ajout pièce SANS ordre → attendu 201, ordre = 1
+# @name salon
+POST {{baseUrl}}/etats-des-lieux/{{edl.response.body.idEdl}}/pieces
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "libelle": "Salon" }
+
+### 3. Deuxième pièce sans ordre → attendu 201, ordre = 2
+POST {{baseUrl}}/etats-des-lieux/{{edl.response.body.idEdl}}/pieces
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "libelle": "Cuisine" }
+
+### 4. Ajout élément avec état → attendu 201
+# @name mur
+POST {{baseUrl}}/pieces/{{salon.response.body.idPiece}}/elements
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "libelle": "Mur principal", "etat": "bonEtat" }
+
+### 5. Élément SANS état → attendu 400 "Données invalides"
+POST {{baseUrl}}/pieces/{{salon.response.body.idPiece}}/elements
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "libelle": "Plafond" }
+
+### 6. Modification de l'état + commentaire → attendu 200
+PUT {{baseUrl}}/elements/{{mur.response.body.idElement}}
+Authorization: Bearer {{connexion.response.body.jeton}}
+Content-Type: application/json
+
+{ "libelle": "Mur principal", "etat": "mauvaisEtat", "commentaire": "Fissure au-dessus de la fenêtre" }
+
+### 7. Consultation de l'EDL → attendu : Salon (ordre 1) avec son élément, Cuisine (ordre 2)
+GET {{baseUrl}}/etats-des-lieux/{{edl.response.body.idEdl}}
+Authorization: Bearer {{connexion.response.body.jeton}}
+
+### 8. Suppression de l'élément → attendu 204
+DELETE {{baseUrl}}/elements/{{mur.response.body.idElement}}
+Authorization: Bearer {{connexion.response.body.jeton}}
+
+### 9. Suppression de la pièce Salon → attendu 204
+DELETE {{baseUrl}}/pieces/{{salon.response.body.idPiece}}
+Authorization: Bearer {{connexion.response.body.jeton}}
