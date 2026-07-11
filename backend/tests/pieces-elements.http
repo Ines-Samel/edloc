@@ -13,7 +13,7 @@ POST {{baseUrl}}/etats-des-lieux
 Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
-{ "idBien": "e23c57f1-6e39-4f85-88da-ae3e1db04f50", "typeEdl": "entree", "locataire": { "nom": "Martin", "prenom": "Jo", "email": "jo.martin@test.fr" } }
+{ "idBien": "0581b1a1-a4ac-48ab-b684-dec40f18bf6e", "typeEdl": "entree", "locataire": { "nom": "Martin", "prenom": "Jo", "email": "jo.martin@test.fr" } }
 
 ### 2. Ajout pièce SANS ordre → attendu 201, ordre = 1
 # @name salon
