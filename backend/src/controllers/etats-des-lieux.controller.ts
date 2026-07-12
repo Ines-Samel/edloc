@@ -6,6 +6,7 @@ import {
   modifierEdl,
   listerEdlParBien,
 } from '../services/etats-des-lieux.service';
+import { comparer as comparerEdl } from '../services/comparaison.service';
 import { CreationEdlInput, ModificationEdlInput } from '../schemas/etats-des-lieux.schema';
 
 function estUUID(id: string): boolean {
@@ -81,4 +82,32 @@ export async function listerParBien(req: Request, res: Response): Promise<void> 
     return;
   }
   res.status(200).json(resultat.donnees);
+}
+
+export async function comparer(req: Request, res: Response): Promise<void> {
+  const id = req.params.id as string;
+  if (!estUUID(id)) {
+    res.status(404).json({ erreur: 'Ressource introuvable' });
+    return;
+  }
+  const idBailleur = req.utilisateur!.sub;
+  const resultat = await comparerEdl(idBailleur, id);
+
+  if (resultat.type === 'introuvable') {
+    res.status(404).json({ erreur: 'Ressource introuvable' });
+    return;
+  }
+  if (resultat.type === 'pasUneSortie') {
+    res.status(422).json({
+      erreur: "La comparaison n'est disponible que depuis un état des lieux de sortie",
+    });
+    return;
+  }
+  if (resultat.type === 'entreeManquante') {
+    res.status(422).json({
+      erreur: "Aucun état des lieux d'entrée signé pour ce bien et ce locataire",
+    });
+    return;
+  }
+  res.status(200).json(resultat.comparaison);
 }
