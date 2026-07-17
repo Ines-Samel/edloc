@@ -52,19 +52,19 @@ L'organisation détaillée des dossiers est décrite dans `docs/conception_techn
 
 | Dossier | Livrable | Contenu |
 | --- | --- | --- |
-| `analyse_besoins/` | Cahier des charges | besoin, périmètre, 16 règles de gestion, exigences, architecture, planning |
-| | User stories | 20 récits utilisateur avec critères d'acceptation référençant les règles de gestion |
+| `analyse_besoins/` | Cahier des charges | besoin, périmètre, 18 règles de gestion, exigences, architecture, planning |
+| | User stories | 22 récits utilisateur avec critères d'acceptation référençant les règles de gestion |
 | | Diagramme de cas d'utilisation | 3 acteurs, 14 cas |
 | | Diagramme d'activité | cycle de vie complet d'un EDL (couloirs bailleur / système / locataire) |
 | `conception_donnees/` | MCD / MLD / MPD | modèle de données Merise |
 | | edloc_mpd.sql | script PostgreSQL du modèle physique |
 | `conception_fonctionnelle/` | Diagrammes de séquence | connexion, création + photos, signature + PDF, sortie + comparaison |
-| `conception_technique/` | Arborescence du site & routes API | sitemap 3 zones, 33 routes documentées (accès, user stories) |
+| `conception_technique/` | Arborescence du site & routes API | sitemap 3 zones, 38 routes documentées (accès, user stories) |
 | | Arborescence du projet | organisation des dossiers backend / frontend |
 | | Conventions de nommage | BDD, API, code TypeScript, Git |
 | `conception_UI/` | Charte graphique | identité « Chaleureuse & accessible » : palette, typographie, logo, accessibilité |
-| | Wireframes | 11 écrans × 3 formats (mobile, tablette, desktop), basse fidélité |
-| | Maquettes | 12 écrans haute fidélité appliquant la charte |
+| | Wireframes | 16 écrans basse fidélité : 15 déclinés en 3 formats, administration au format desktop |
+| | Maquettes | 16 écrans haute fidélité appliquant la charte |
 
 ## Conventions
 
