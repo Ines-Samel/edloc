@@ -40,8 +40,9 @@ export async function connecter(donnees: ConnexionInput) {
   if (bailleur) {
     const valide = await argon2.verify(bailleur.motDePasseHashe, donnees.motDePasse);
     if (!valide) return null;
+    if (!bailleur.actif) return { type: 'desactive' as const };
     const jeton = genererJeton(bailleur.idBailleur, 'bailleur');
-    return { jeton, role: 'bailleur' as const };
+    return { type: 'ok' as const, jeton, role: 'bailleur' as const };
   }
 
   const admin = await prisma.administrateur.findUnique({ where: { email: donnees.email } });
@@ -50,7 +51,7 @@ export async function connecter(donnees: ConnexionInput) {
     const valide = await argon2.verify(admin.motDePasseHashe, donnees.motDePasse);
     if (!valide) return null;
     const jeton = genererJeton(admin.idAdministrateur, 'administrateur');
-    return { jeton, role: 'administrateur' as const };
+    return { type: 'ok' as const, jeton, role: 'administrateur' as const };
   }
 
   return null;
