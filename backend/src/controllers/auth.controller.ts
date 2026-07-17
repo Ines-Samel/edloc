@@ -22,8 +22,11 @@ export async function connexion(req: Request, res: Response): Promise<void> {
     res.status(401).json({ erreur: 'Identifiants invalides' });
     return;
   }
-
-  res.status(200).json(resultat);
+  if (resultat.type === 'desactive') {
+    res.status(403).json({ erreur: 'Votre compte a été désactivé' });
+    return;
+  }
+  res.status(200).json({ jeton: resultat.jeton, role: resultat.role });
 }
 
 export async function me(req: Request, res: Response): Promise<void> {

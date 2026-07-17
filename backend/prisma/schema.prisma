@@ -37,15 +37,25 @@ enum RoleSignataire {
   @@map("role_signataire_enum")
 }
 
+enum TypeJeton {
+  verification
+  reinitialisation
+
+  @@map("type_jeton_enum")
+}
+
 model Bailleur {
-  idBailleur      String   @id @default(dbgenerated("gen_random_uuid()")) @map("id_bailleur") @db.Uuid
-  nom             String   @db.VarChar(100)
-  prenom          String   @db.VarChar(100)
-  email           String   @unique @db.VarChar(255)
-  motDePasseHashe String   @map("mot_de_passe_hashe") @db.VarChar(255)
-  telephone       String?  @db.VarChar(20)
-  dateCreation    DateTime @default(now()) @map("date_creation") @db.Timestamp(6)
+  idBailleur      String       @id @default(dbgenerated("gen_random_uuid()")) @map("id_bailleur") @db.Uuid
+  nom             String       @db.VarChar(100)
+  prenom          String       @db.VarChar(100)
+  email           String       @unique @db.VarChar(255)
+  motDePasseHashe String       @map("mot_de_passe_hashe") @db.VarChar(255)
+  telephone       String?      @db.VarChar(20)
+  actif           Boolean      @default(true)
+  emailVerifie    Boolean      @default(false) @map("email_verifie")
+  dateCreation    DateTime     @default(now()) @map("date_creation") @db.Timestamp(6)
   biens           Bien[]
+  jetonsEmail     JetonEmail[]
 
   @@map("bailleur")
 }
@@ -144,4 +154,18 @@ model Administrateur {
   dateCreation     DateTime @default(now()) @map("date_creation") @db.Timestamp(6)
 
   @@map("administrateur")
+}
+
+model JetonEmail {
+  idJeton         String    @id @default(dbgenerated("gen_random_uuid()")) @map("id_jeton") @db.Uuid
+  type            TypeJeton
+  jetonHashe      String    @map("jeton_hashe") @db.VarChar(255)
+  dateExpiration  DateTime  @map("date_expiration") @db.Timestamp(6)
+  dateUtilisation DateTime? @map("date_utilisation") @db.Timestamp(6)
+  dateCreation    DateTime  @default(now()) @map("date_creation") @db.Timestamp(6)
+  idBailleur      String    @map("id_bailleur") @db.Uuid
+  bailleur        Bailleur  @relation(fields: [idBailleur], references: [idBailleur], onDelete: Cascade, map: "fk_jeton_bailleur")
+
+  @@index([idBailleur], map: "idx_jeton_bailleur")
+  @@map("jeton_email")
 }

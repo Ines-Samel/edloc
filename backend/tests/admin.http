@@ -1,0 +1,63 @@
+@baseUrl = http://localhost:4000/api
+
+### 0. Connexion administrateur
+# @name admin
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{ "email": "{{$dotenv ADMIN_EMAIL}}", "motDePasse": "{{$dotenv ADMIN_PASSWORD}}" }
+
+### 1. Liste des bailleurs → attendu 200 { donnees, pagination }, compteurs biens/EDL, AUCUN hash
+GET {{baseUrl}}/admin/utilisateurs
+Authorization: Bearer {{admin.response.body.jeton}}
+
+### 2. Recherche → attendu : Camille ressort
+GET {{baseUrl}}/admin/utilisateurs?recherche=camille
+Authorization: Bearer {{admin.response.body.jeton}}
+
+### 3. Un bailleur tente d'accéder → attendu 403 "Accès réservé à l'administrateur"
+# @name bailleur
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{ "email": "camille@test.fr", "motDePasse": "MotDePasseTest12" }
+
+### 3b.
+GET {{baseUrl}}/admin/utilisateurs
+Authorization: Bearer {{bailleur.response.body.jeton}}
+
+### 4. Désactivation de Camille (colle son idBailleur du test 2) → attendu 200, actif: false
+PATCH {{baseUrl}}/admin/utilisateurs/33ec14e6-aee9-438c-afd2-676989f4f58a/statut
+Authorization: Bearer {{admin.response.body.jeton}}
+Content-Type: application/json
+
+{ "actif": false }
+
+### 5. Camille tente de se connecter → attendu 403 "Votre compte a été désactivé"
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{ "email": "camille@test.fr", "motDePasse": "MotDePasseTest12" }
+
+### 5b. Mauvais mot de passe sur compte désactivé → attendu 401 "Identifiants invalides" (PAS le message désactivé)
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{ "email": "camille@test.fr", "motDePasse": "MauvaisMotDePasse99" }
+
+### 6. Réactivation → attendu 200, actif: true (puis rejouer le 3 : connexion OK)
+PATCH {{baseUrl}}/admin/utilisateurs/33ec14e6-aee9-438c-afd2-676989f4f58a/statut
+Authorization: Bearer {{admin.response.body.jeton}}
+Content-Type: application/json
+
+{ "actif": true }
+
+### 7. Suppression RGPD : crée un bailleur jetable, colle son id → attendu 204
+POST {{baseUrl}}/auth/inscription
+Content-Type: application/json
+
+{ "nom": "Jetable", "prenom": "Test", "email": "jetable@test.fr", "motDePasse": "MotDePasseTest12" }
+
+### 7b.
+DELETE {{baseUrl}}/admin/utilisateurs/50f4e108-cbaa-4005-b664-bfd402f3800f
+Authorization: Bearer {{admin.response.body.jeton}}
