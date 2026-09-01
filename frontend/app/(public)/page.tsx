@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { Button } from "@/components/ui/button";
+
 // Écran 1 (page d'accueil) — version d'amorçage : titre, baseline et les deux actions.
 // Les trois fonctionnalités illustrées et le parcours en trois étapes viendront avec
 // le jalon des pages publiques.
@@ -20,18 +22,12 @@ export default function PageAccueil() {
         </p>
 
         <div className="flex flex-col items-center gap-4 sm:flex-row">
-          <Link
-            href="/inscription"
-            className="flex min-h-cible items-center justify-center rounded-pilule bg-terracotta-fonce px-8 text-libelle text-white transition-colors hover:bg-alerte-foncee"
-          >
-            Créer un compte gratuitement
-          </Link>
-          <Link
-            href="/connexion"
-            className="flex min-h-cible items-center justify-center rounded-pilule border-2 border-terracotta-fonce px-8 text-libelle text-terracotta-fonce transition-colors hover:bg-sable"
-          >
-            Se connecter
-          </Link>
+          <Button asChild>
+            <Link href="/inscription">Créer un compte gratuitement</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/connexion">Se connecter</Link>
+          </Button>
         </div>
       </main>
 
