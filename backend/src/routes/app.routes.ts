@@ -5,6 +5,7 @@ import { etatsDesLieuxRoutes } from './etats-des-lieux.routes';
 import { piecesRoutes } from './pieces.routes';
 import { elementsRoutes } from './elements.routes';
 import { photosRoutes } from './photos.routes';
+import { compteRoutes } from './compte.routes';
 import { adminRoutes } from './admin.routes';
 
 export const appRoutes = Router();
@@ -15,5 +16,6 @@ appRoutes.use('/etats-des-lieux', etatsDesLieuxRoutes);
 appRoutes.use('/pieces', piecesRoutes);
 appRoutes.use('/elements', elementsRoutes);
 appRoutes.use('/photos', photosRoutes);
+appRoutes.use('/compte', compteRoutes);
 appRoutes.use('/admin', adminRoutes);
 

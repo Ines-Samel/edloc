@@ -4,10 +4,7 @@ export const inscriptionSchema = z.object({
   nom: z.string().trim().min(1, 'Le nom est requis').max(100),
   prenom: z.string().trim().min(1, 'Le prénom est requis').max(100),
   email: z.string().email('Adresse e-mail invalide').max(255),
-  motDePasse: z
-    .string()
-    .min(12, 'Le mot de passe doit contenir au moins 12 caractères')
-    .max(128),
+  motDePasse: z.string().min(12, 'Le mot de passe doit contenir au moins 12 caractères').max(128),
   telephone: z.string().max(20).optional(),
 });
 
@@ -16,5 +13,26 @@ export const connexionSchema = z.object({
   motDePasse: z.string().min(1, 'Le mot de passe est requis'),
 });
 
+export const confirmationSchema = z.object({
+  jeton: z.string().trim().min(1, 'Le jeton est requis'),
+});
+
+export const renvoiConfirmationSchema = z.object({
+  email: z.string().email('Adresse e-mail invalide'),
+});
+
+export const motDePasseOublieSchema = z.object({
+  email: z.string().email('Adresse e-mail invalide'),
+});
+
+export const reinitialisationSchema = z.object({
+  jeton: z.string().trim().min(1, 'Le jeton est requis'),
+  motDePasse: z.string().min(12, 'Le mot de passe doit contenir au moins 12 caractères').max(128),
+});
+
 export type InscriptionInput = z.infer<typeof inscriptionSchema>;
 export type ConnexionInput = z.infer<typeof connexionSchema>;
+export type ConfirmationInput = z.infer<typeof confirmationSchema>;
+export type RenvoiConfirmationInput = z.infer<typeof renvoiConfirmationSchema>;
+export type MotDePasseOublieInput = z.infer<typeof motDePasseOublieSchema>;
+export type ReinitialisationInput = z.infer<typeof reinitialisationSchema>;

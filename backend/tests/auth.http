@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:4000/api
 
-### 1. Inscription → attendu 201, sans mot de passe ni hash dans la réponse
+### 1. Inscription → attendu 202 + message générique (aucune donnée de compte en réponse)
 POST {{baseUrl}}/auth/inscription
 Content-Type: application/json
 
@@ -11,7 +11,8 @@ Content-Type: application/json
   "motDePasse": "MotDePasseTest12"
 }
 
-### 2. Même e-mail (relancer le 1 revient au même) → attendu 400 "L'inscription a échoué"
+### 2. Même e-mail → attendu 202 avec le message identique au 1 (anti-énumération).
+### Aucun compte n'est créé ; l'e-mail de confirmation est renvoyé si l'adresse n'est pas encore confirmée.
 POST {{baseUrl}}/auth/inscription
 Content-Type: application/json
 
@@ -33,7 +34,42 @@ Content-Type: application/json
   "motDePasse": "OnzeCaracte"
 }
 
-### 4. Connexion bailleur → attendu 200 { jeton, role: "bailleur" }
+### 4. Connexion avant confirmation → attendu 403 "Votre adresse e-mail n'a pas encore été confirmée"
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{
+  "email": "camille@test.fr",
+  "motDePasse": "MotDePasseTest12"
+}
+
+### 5. Confirmation du compte → attendu 200 "Votre compte est confirmé"
+### Coller le jeton reçu dans le lien de l'e-mail (http://localhost:3000/confirmation?jeton=...)
+POST {{baseUrl}}/auth/confirmation
+Content-Type: application/json
+
+{
+  "jeton": "COLLER_LE_JETON_DE_L_EMAIL"
+}
+
+### 6. Rejeu du même jeton (usage unique, RG18) → attendu 400 "invalide ou a expiré"
+POST {{baseUrl}}/auth/confirmation
+Content-Type: application/json
+
+{
+  "jeton": "COLLER_LE_JETON_DE_L_EMAIL"
+}
+
+### 7. Renvoi de l'e-mail de confirmation → attendu 202, réponse générique
+### (adresse inconnue ou compte déjà confirmé : même réponse, aucun e-mail envoyé)
+POST {{baseUrl}}/auth/renvoyer-confirmation
+Content-Type: application/json
+
+{
+  "email": "camille@test.fr"
+}
+
+### 8. Connexion bailleur après confirmation → attendu 200 { jeton, role: "bailleur" }
 # @name connexionBailleur
 POST {{baseUrl}}/auth/connexion
 Content-Type: application/json
@@ -43,7 +79,7 @@ Content-Type: application/json
   "motDePasse": "MotDePasseTest12"
 }
 
-### 5. Mauvais mot de passe → attendu 401 "Identifiants invalides"
+### 9. Mauvais mot de passe → attendu 401 "Identifiants invalides"
 POST {{baseUrl}}/auth/connexion
 Content-Type: application/json
 
@@ -52,7 +88,7 @@ Content-Type: application/json
   "motDePasse": "MauvaisMotDePasse1"
 }
 
-### 6. Connexion administrateur (lit ton .env) → attendu 200 { jeton, role: "administrateur" }
+### 10. Connexion administrateur (lit ton .env) → attendu 200 { jeton, role: "administrateur" }
 POST {{baseUrl}}/auth/connexion
 Content-Type: application/json
 
@@ -61,9 +97,62 @@ Content-Type: application/json
   "motDePasse": "{{$dotenv ADMIN_PASSWORD}}"
 }
 
-### 7a. Profil avec le jeton du test 4 → attendu 200 { id, nom, prenom, email, role }
+### 11. Mot de passe oublié → attendu 202, réponse générique que l'adresse existe ou non
+POST {{baseUrl}}/auth/mot-de-passe-oublie
+Content-Type: application/json
+
+{
+  "email": "camille@test.fr"
+}
+
+### 12. Adresse inconnue → attendu 202 avec le message identique au 11
+POST {{baseUrl}}/auth/mot-de-passe-oublie
+Content-Type: application/json
+
+{
+  "email": "inconnu@test.fr"
+}
+
+### 13. Réinitialisation → attendu 200 "Votre mot de passe a été modifié"
+### Coller le jeton reçu dans le lien de l'e-mail (http://localhost:3000/reinitialisation?jeton=...)
+POST {{baseUrl}}/auth/reinitialisation
+Content-Type: application/json
+
+{
+  "jeton": "COLLER_LE_JETON_DE_L_EMAIL",
+  "motDePasse": "NouveauMotDePasse34"
+}
+
+### 14. Rejeu du jeton de réinitialisation → attendu 400 "invalide ou a expiré"
+POST {{baseUrl}}/auth/reinitialisation
+Content-Type: application/json
+
+{
+  "jeton": "COLLER_LE_JETON_DE_L_EMAIL",
+  "motDePasse": "EncoreUnAutre567"
+}
+
+### 15. Connexion avec l'ancien mot de passe → attendu 401 "Identifiants invalides"
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{
+  "email": "camille@test.fr",
+  "motDePasse": "MotDePasseTest12"
+}
+
+### 16. Connexion avec le nouveau mot de passe → attendu 200 { jeton, role: "bailleur" }
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{
+  "email": "camille@test.fr",
+  "motDePasse": "NouveauMotDePasse34"
+}
+
+### 17a. Profil avec le jeton du test 8 → attendu 200 { id, nom, prenom, email, role }
 GET {{baseUrl}}/auth/me
 Authorization: Bearer {{connexionBailleur.response.body.jeton}}
 
-### 7b. Profil sans jeton → attendu 401 "Authentification requise"
+### 17b. Profil sans jeton → attendu 401 "Authentification requise"
 GET {{baseUrl}}/auth/me

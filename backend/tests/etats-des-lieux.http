@@ -48,3 +48,16 @@ Authorization: Bearer {{connexion.response.body.jeton}}
 ### 7. UUID inconnu → attendu 404
 GET {{baseUrl}}/etats-des-lieux/00000000-0000-0000-0000-000000000000
 Authorization: Bearer {{connexion.response.body.jeton}}
+
+### Lister tous les états des lieux du bailleur, biens confondus → attendu 200 { donnees, pagination }
+### Antéchronologique. Filtres optionnels : idBien, dateDebut, dateFin (AAAA-MM-JJ), page, limite.
+GET {{baseUrl}}/etats-des-lieux
+Authorization: Bearer {{connexion.response.body.jeton}}
+
+### Filtré par bien et par période → attendu 200, liste restreinte
+GET {{baseUrl}}/etats-des-lieux?idBien={{bien.response.body.idBien}}&dateDebut=2026-01-01&dateFin=2026-12-31
+Authorization: Bearer {{connexion.response.body.jeton}}
+
+### Date au mauvais format → attendu 400 "Paramètres invalides"
+GET {{baseUrl}}/etats-des-lieux?dateDebut=15-01-2026
+Authorization: Bearer {{connexion.response.body.jeton}}

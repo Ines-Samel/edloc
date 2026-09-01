@@ -5,12 +5,24 @@ import {
   obtenirEdl,
   modifierEdl,
   listerEdlParBien,
+  listerEdl,
 } from '../services/etats-des-lieux.service';
 import { comparer as comparerEdl } from '../services/comparaison.service';
-import { CreationEdlInput, ModificationEdlInput } from '../schemas/etats-des-lieux.schema';
+import {
+  CreationEdlInput,
+  ModificationEdlInput,
+  ListeEdlQuery,
+} from '../schemas/etats-des-lieux.schema';
 
 function estUUID(id: string): boolean {
   return z.string().uuid().safeParse(id).success;
+}
+
+export async function lister(req: Request, res: Response): Promise<void> {
+  const idBailleur = req.utilisateur!.sub;
+  const query = res.locals.query as ListeEdlQuery;
+  const resultat = await listerEdl(idBailleur, query);
+  res.status(200).json(resultat);
 }
 
 export async function creer(req: Request, res: Response): Promise<void> {
