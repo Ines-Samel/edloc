@@ -53,3 +53,36 @@ export async function envoyerPdfSigne(idEdl: string): Promise<string[]> {
 
   return destinataires;
 }
+
+// Base des liens envoyés par e-mail : pages publiques du front (écrans 4 et 5 des maquettes).
+const URL_FRONTEND = process.env.URL_FRONTEND ?? 'http://localhost:3000';
+
+export async function envoyerConfirmationCompte(
+  destinataire: string,
+  prenom: string,
+  jeton: string,
+): Promise<void> {
+  const lien = `${URL_FRONTEND}/confirmation?jeton=${jeton}`;
+
+  await mailer.sendMail({
+    from: EMAIL_EXPEDITEUR,
+    to: destinataire,
+    subject: 'Confirmez votre adresse e-mail — EDLoc',
+    text: `Bonjour ${prenom},\n\nBienvenue sur EDLoc. Pour activer votre compte, confirmez votre adresse e-mail en ouvrant le lien ci-dessous :\n\n${lien}\n\nCe lien est valable 24 heures et ne peut servir qu'une seule fois. Tant que votre adresse n'est pas confirmée, la connexion reste impossible.\n\nSi vous n'êtes pas à l'origine de cette inscription, ignorez simplement ce message.\n\nCordialement,\nL'équipe EDLoc`,
+  });
+}
+
+export async function envoyerReinitialisationMotDePasse(
+  destinataire: string,
+  prenom: string,
+  jeton: string,
+): Promise<void> {
+  const lien = `${URL_FRONTEND}/reinitialisation?jeton=${jeton}`;
+
+  await mailer.sendMail({
+    from: EMAIL_EXPEDITEUR,
+    to: destinataire,
+    subject: 'Réinitialisation de votre mot de passe — EDLoc',
+    text: `Bonjour ${prenom},\n\nVous avez demandé la réinitialisation de votre mot de passe EDLoc. Définissez-en un nouveau en ouvrant le lien ci-dessous :\n\n${lien}\n\nCe lien est valable 1 heure et ne peut servir qu'une seule fois.\n\nSi vous n'êtes pas à l'origine de cette demande, ignorez ce message : votre mot de passe actuel reste valable.\n\nCordialement,\nL'équipe EDLoc`,
+  });
+}
