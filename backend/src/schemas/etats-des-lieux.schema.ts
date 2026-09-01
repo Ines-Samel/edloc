@@ -23,6 +23,21 @@ export const modificationEdlSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'La date doit être au format AAAA-MM-JJ'),
 });
 
+export const listeEdlQuerySchema = z.object({
+  idBien: z.string().uuid().optional(),
+  dateDebut: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'La date doit être au format AAAA-MM-JJ')
+    .optional(),
+  dateFin: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'La date doit être au format AAAA-MM-JJ')
+    .optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limite: z.coerce.number().int().min(1).max(100).default(20),
+});
+
 export type LocataireInput = z.infer<typeof locataireSchema>;
 export type CreationEdlInput = z.infer<typeof creationEdlSchema>;
 export type ModificationEdlInput = z.infer<typeof modificationEdlSchema>;
+export type ListeEdlQuery = z.infer<typeof listeEdlQuerySchema>;

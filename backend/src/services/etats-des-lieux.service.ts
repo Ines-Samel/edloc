@@ -1,5 +1,10 @@
 import { prisma } from '../lib/prisma';
-import { CreationEdlInput, ModificationEdlInput } from '../schemas/etats-des-lieux.schema';
+import { Prisma } from '../../generated/prisma';
+import {
+  CreationEdlInput,
+  ModificationEdlInput,
+  ListeEdlQuery,
+} from '../schemas/etats-des-lieux.schema';
 
 export async function creerEdl(idBailleur: string, donnees: CreationEdlInput) {
   const bien = await prisma.bien.findFirst({
@@ -156,4 +161,58 @@ export async function listerEdlParBien(idBailleur: string, idBien: string) {
   });
 
   return { type: 'ok' as const, donnees: etatsDesLieux };
+}
+
+// Liste transversale : tous les états des lieux du bailleur, biens confondus,
+// avec filtres optionnels par bien et par période.
+export async function listerEdl(idBailleur: string, query: ListeEdlQuery) {
+  const { idBien, dateDebut, dateFin, page, limite } = query;
+
+  const where: Prisma.EtatDesLieuxWhereInput = { bien: { idBailleur } };
+
+  if (idBien) {
+    where.idBien = idBien;
+  }
+
+  if (dateDebut || dateFin) {
+    where.dateEdl = {
+      ...(dateDebut ? { gte: new Date(dateDebut) } : {}),
+      ...(dateFin ? { lte: new Date(dateFin) } : {}),
+    };
+  }
+
+  const skip = (page - 1) * limite;
+
+  const [donnees, total] = await Promise.all([
+    prisma.etatDesLieux.findMany({
+      where,
+      orderBy: [{ dateEdl: 'desc' }, { dateSignature: 'desc' }],
+      skip,
+      take: limite,
+      select: {
+        idEdl: true,
+        typeEdl: true,
+        statut: true,
+        dateEdl: true,
+        dateSignature: true,
+        bien: {
+          select: { idBien: true, adresse: true, codePostal: true, ville: true },
+        },
+        locataire: {
+          select: { nom: true, prenom: true },
+        },
+      },
+    }),
+    prisma.etatDesLieux.count({ where }),
+  ]);
+
+  return {
+    donnees,
+    pagination: {
+      page,
+      limite,
+      total,
+      totalPages: Math.ceil(total / limite),
+    },
+  };
 }
