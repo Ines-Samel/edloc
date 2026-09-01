@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+/*
+ * Tokens de la charte graphique EDLoc v1.0 — « Chaleureuse & accessible ».
+ * Tailwind v4 déclare les tokens en CSS : il n'y a pas de tailwind.config.ts.
+ * Chaque teinte existe en ton d'ambiance (décors, aplats) et en ton foncé,
+ * seul autorisé dès qu'il porte du texte ou une icône (contraste AA minimum).
+ */
+@theme {
+  /* Couleurs principales */
+  --color-terracotta: #c05b3c;
+  --color-terracotta-fonce: #a64b2a;
+  --color-creme: #faf6f1;
+
+  /* Couleurs secondaires et fonctionnelles */
+  --color-sauge: #5b7b62;
+  --color-vert-profond: #3f6047;
+  --color-ocre: #e9c46a;
+  --color-ocre-fonce: #8a5a00;
+  --color-alerte: #b0503b;
+  --color-alerte-foncee: #9c3222;
+
+  /* Neutres */
+  --color-encre: #2b2420;
+  --color-brun: #5c5142;
+  --color-sable: #eae1d6;
+
+  /* Typographie : Nunito Sans, graisses 400 / 600 / 700 / 800 */
+  --font-sans: var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --text-titre-1: 1.75rem; /* 28 px */
+  --text-titre-1--line-height: 1.2;
+  --text-titre-1--font-weight: 800;
+
+  --text-titre-2: 1.3125rem; /* 21 px */
+  --text-titre-2--line-height: 1.25;
+  --text-titre-2--font-weight: 800;
+
+  --text-sous-titre: 1.0625rem; /* 17 px */
+  --text-sous-titre--line-height: 1.35;
+  --text-sous-titre--font-weight: 700;
+
+  --text-courant: 1rem; /* 16 px */
+  --text-courant--line-height: 1.6;
+  --text-courant--font-weight: 400;
+
+  --text-libelle: 0.875rem; /* 14 px */
+  --text-libelle--line-height: 1.4;
+  --text-libelle--font-weight: 700;
+
+  --text-legende: 0.8125rem; /* 13 px — jamais plus petit */
+  --text-legende--line-height: 1.4;
+  --text-legende--font-weight: 600;
+
+  /* Formes : boutons et pastilles en pilule */
+  --radius-pilule: 9999px;
+  --radius-carte: 0.75rem;
+
+  /* Cible tactile minimale de la charte */
+  --spacing-cible: 3rem; /* 48 px */
+}
+
+@layer base {
+  body {
+    background-color: var(--color-creme);
+    color: var(--color-encre);
+    font-family: var(--font-sans);
+    font-size: var(--text-courant);
+    line-height: 1.6;
+  }
+
+  /* Anneau de focus de la charte : 3 px encre chaude, décalé de 3 px. */
+  :focus-visible {
+    outline: 3px solid var(--color-encre);
+    outline-offset: 3px;
+  }
+}
