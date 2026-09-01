@@ -57,18 +57,31 @@ export async function envoyerPdfSigne(idEdl: string): Promise<string[]> {
 // Base des liens envoyés par e-mail : pages publiques du front (écrans 4 et 5 des maquettes).
 const URL_FRONTEND = process.env.URL_FRONTEND ?? 'http://localhost:3000';
 
+// Le même jeton de vérification sert à l'inscription et au changement d'adresse :
+// seul le texte de l'e-mail diffère.
 export async function envoyerConfirmationCompte(
   destinataire: string,
   prenom: string,
   jeton: string,
+  contexte: 'inscription' | 'changementAdresse' = 'inscription',
 ): Promise<void> {
   const lien = `${URL_FRONTEND}/confirmation?jeton=${jeton}`;
+
+  const introduction =
+    contexte === 'inscription'
+      ? 'Bienvenue sur EDLoc. Pour activer votre compte, confirmez votre adresse e-mail en ouvrant le lien ci-dessous :'
+      : "Vous avez modifié l'adresse e-mail de votre compte EDLoc. Pour la valider, ouvrez le lien ci-dessous :";
+
+  const avertissement =
+    contexte === 'inscription'
+      ? "Si vous n'êtes pas à l'origine de cette inscription, ignorez simplement ce message."
+      : "Si vous n'êtes pas à l'origine de ce changement, contactez-nous sans tarder.";
 
   await mailer.sendMail({
     from: EMAIL_EXPEDITEUR,
     to: destinataire,
     subject: 'Confirmez votre adresse e-mail — EDLoc',
-    text: `Bonjour ${prenom},\n\nBienvenue sur EDLoc. Pour activer votre compte, confirmez votre adresse e-mail en ouvrant le lien ci-dessous :\n\n${lien}\n\nCe lien est valable 24 heures et ne peut servir qu'une seule fois. Tant que votre adresse n'est pas confirmée, la connexion reste impossible.\n\nSi vous n'êtes pas à l'origine de cette inscription, ignorez simplement ce message.\n\nCordialement,\nL'équipe EDLoc`,
+    text: `Bonjour ${prenom},\n\n${introduction}\n\n${lien}\n\nCe lien est valable 24 heures et ne peut servir qu'une seule fois. Tant que votre adresse n'est pas confirmée, la connexion reste impossible.\n\n${avertissement}\n\nCordialement,\nL'équipe EDLoc`,
   });
 }
 

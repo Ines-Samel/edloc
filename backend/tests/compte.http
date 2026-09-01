@@ -1,0 +1,132 @@
+@baseUrl = http://localhost:4000/api
+
+### 0. Connexion bailleur (compte confirmé) → fournit le jeton des appels suivants
+# @name connexionBailleur
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{
+  "email": "camille@test.fr",
+  "motDePasse": "MotDePasseTest12"
+}
+
+@jeton = {{connexionBailleur.response.body.jeton}}
+
+### 1. Consulter son profil → attendu 200 (sans le mot de passe haché)
+GET {{baseUrl}}/compte
+Authorization: Bearer {{jeton}}
+
+### 2. Sans jeton → attendu 401 "Authentification requise"
+GET {{baseUrl}}/compte
+
+### 3. Avec un jeton administrateur → attendu 403 "Accès réservé aux comptes bailleurs"
+# @name connexionAdmin
+POST {{baseUrl}}/auth/connexion
+Content-Type: application/json
+
+{
+  "email": "{{$dotenv ADMIN_EMAIL}}",
+  "motDePasse": "{{$dotenv ADMIN_PASSWORD}}"
+}
+
+###
+GET {{baseUrl}}/compte
+Authorization: Bearer {{connexionAdmin.response.body.jeton}}
+
+### 4. Modifier son profil sans toucher à l'e-mail → attendu 200, emailAConfirmer: false
+PUT {{baseUrl}}/compte
+Authorization: Bearer {{jeton}}
+Content-Type: application/json
+
+{
+  "nom": "Test",
+  "prenom": "Camille",
+  "email": "camille@test.fr",
+  "telephone": "0611223344"
+}
+
+### 5. Adresse déjà utilisée (autre bailleur ou administrateur) → attendu 409
+PUT {{baseUrl}}/compte
+Authorization: Bearer {{jeton}}
+Content-Type: application/json
+
+{
+  "nom": "Test",
+  "prenom": "Camille",
+  "email": "{{$dotenv ADMIN_EMAIL}}"
+}
+
+### 6. Changer d'adresse e-mail → attendu 200, emailAConfirmer: true
+### Le compte repasse à emailVerifie = false et un e-mail de confirmation part vers la nouvelle adresse :
+### la connexion est refusée (403) tant que le lien n'est pas ouvert (RG17).
+PUT {{baseUrl}}/compte
+Authorization: Bearer {{jeton}}
+Content-Type: application/json
+
+{
+  "nom": "Test",
+  "prenom": "Camille",
+  "email": "camille.nouvelle@test.fr",
+  "telephone": "0611223344"
+}
+
+### 7. Mot de passe actuel erroné → attendu 403 "Mot de passe actuel incorrect"
+PUT {{baseUrl}}/compte/mot-de-passe
+Authorization: Bearer {{jeton}}
+Content-Type: application/json
+
+{
+  "motDePasseActuel": "MauvaisMotDePasse1",
+  "nouveauMotDePasse": "NouveauMotDePasse34"
+}
+
+### 8. Nouveau mot de passe de 6 caractères → attendu 400 "Données invalides"
+PUT {{baseUrl}}/compte/mot-de-passe
+Authorization: Bearer {{jeton}}
+Content-Type: application/json
+
+{
+  "motDePasseActuel": "MotDePasseTest12",
+  "nouveauMotDePasse": "Court1"
+}
+
+### 9. Changer son mot de passe → attendu 200 (les demandes de réinitialisation en cours sont annulées)
+PUT {{baseUrl}}/compte/mot-de-passe
+Authorization: Bearer {{jeton}}
+Content-Type: application/json
+
+{
+  "motDePasseActuel": "MotDePasseTest12",
+  "nouveauMotDePasse": "NouveauMotDePasse34"
+}
+
+### 10. Export RGPD → attendu 200, JSON en pièce jointe (edloc-mes-donnees.json)
+GET {{baseUrl}}/compte/export
+Authorization: Bearer {{jeton}}
+
+### 11. Suppression sans mot de passe → attendu 400 "Données invalides"
+DELETE {{baseUrl}}/compte
+Authorization: Bearer {{jeton}}
+Content-Type: application/json
+
+{}
+
+### 12. Suppression avec un mot de passe erroné → attendu 403 "Mot de passe incorrect"
+DELETE {{baseUrl}}/compte
+Authorization: Bearer {{jeton}}
+Content-Type: application/json
+
+{
+  "motDePasse": "MauvaisMotDePasse1"
+}
+
+### 13. Suppression du compte (RG16, irréversible) → attendu 204
+### Efface en cascade biens, états des lieux, pièces, éléments, photos et signatures,
+### ainsi que les fichiers correspondants du stockage objet.
+DELETE {{baseUrl}}/compte
+Authorization: Bearer {{jeton}}
+Content-Type: application/json
+
+{
+  "motDePasse": "NouveauMotDePasse34"
+}

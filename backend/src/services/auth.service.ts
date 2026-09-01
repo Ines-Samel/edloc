@@ -18,14 +18,13 @@ export function genererJeton(sub: string, role: JetonPayload['role']): string {
 // Émet un jeton de confirmation et envoie l'e-mail correspondant.
 // Un échec d'envoi est journalisé sans interrompre l'appelant : la réponse HTTP
 // doit rester identique dans tous les cas (anti-énumération).
-export async function envoyerJetonConfirmation(bailleur: {
-  idBailleur: string;
-  email: string;
-  prenom: string;
-}): Promise<void> {
+export async function envoyerJetonConfirmation(
+  bailleur: { idBailleur: string; email: string; prenom: string },
+  contexte: 'inscription' | 'changementAdresse' = 'inscription',
+): Promise<void> {
   try {
     const jeton = await creerJeton(bailleur.idBailleur, 'verification');
-    await envoyerConfirmationCompte(bailleur.email, bailleur.prenom, jeton);
+    await envoyerConfirmationCompte(bailleur.email, bailleur.prenom, jeton, contexte);
   } catch (err) {
     console.error("Erreur d'envoi de l'e-mail de confirmation :", err);
   }

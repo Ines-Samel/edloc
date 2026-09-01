@@ -23,6 +23,7 @@ Un état des lieux se fait debout, sur place, souvent dans un moment tendu. Sur 
 - **PDF automatique** : généré à la double signature et envoyé par e-mail aux deux parties.
 - **Comparaison entrée / sortie** : écarts calculés élément par élément et mis en évidence.
 - **Historique par bien** : tous les EDL d'un logement, consultables en lecture seule.
+- **Mon compte** : profil modifiable (un changement d'adresse e-mail exige une nouvelle confirmation), changement de mot de passe, export de ses données personnelles et suppression définitive du compte (RGPD).
 - **Administration** : rôle dédié (compte seedé) permettant de lister les comptes, les désactiver et les supprimer (RGPD).
 
 ## Stack technique
@@ -96,6 +97,7 @@ Route de santé : `GET /api/health`. Des fichiers de tests HTTP (extension VS Co
 - [x] Initialisation du backend (Express, routeur central, middlewares, gestion globale des erreurs)
 - [x] Authentification (inscription, connexion, détection de session) avec JWT et Argon2id
 - [x] Confirmation de l'adresse e-mail et mot de passe oublié (jetons à usage unique hachés en base)
+- [x] Espace « Mon compte » : profil, mot de passe, export et suppression RGPD
 - [ ] Initialisation du frontend (Next.js, tokens de la charte)
 - [ ] Gestion des biens
 - [x] États des lieux : création, saisie pièce par pièce, photos horodatées (stockage objet R2)
