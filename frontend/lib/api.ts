@@ -1,5 +1,3 @@
-import { lireJeton } from "./jeton";
-
 const BASE_API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
 export type DetailValidation = { champ: string; message: string };
@@ -19,17 +17,22 @@ export class ErreurApi extends Error {
 
 type OptionsApi = Omit<RequestInit, "body"> & { body?: unknown };
 
+/*
+ * Le jeton d'authentification vit dans un cookie httpOnly posé par l'API : il est
+ * inaccessible au JavaScript, donc rien à lire ni à joindre ici. Il suffit de
+ * demander au navigateur d'envoyer les cookies, y compris si l'API est sur un
+ * autre domaine que le front.
+ */
 export async function api<T>(chemin: string, options: OptionsApi = {}): Promise<T> {
   const { body, headers, ...reste } = options;
-  const jeton = lireJeton();
   const estFormData = body instanceof FormData;
 
   const reponse = await fetch(`${BASE_API}${chemin}`, {
     ...reste,
+    credentials: "include",
     headers: {
       // FormData (envoi de photo) définit lui-même son Content-Type avec sa frontière.
       ...(body !== undefined && !estFormData ? { "Content-Type": "application/json" } : {}),
-      ...(jeton ? { Authorization: `Bearer ${jeton}` } : {}),
       ...headers,
     },
     body: estFormData ? (body as FormData) : body !== undefined ? JSON.stringify(body) : undefined,

@@ -33,7 +33,7 @@ Un état des lieux se fait debout, sur place, souvent dans un moment tendu. Sur 
 | Frontend | Next.js (React + TypeScript) · Tailwind CSS · shadcn/ui |
 | API | Express (TypeScript) · validation Zod |
 | Base de données | PostgreSQL · ORM Prisma |
-| Authentification | JWT · hachage Argon2id · rôles bailleur / administrateur |
+| Authentification | JWT transporté par un cookie httpOnly · hachage Argon2id · rôles bailleur / administrateur |
 | Fichiers | Stockage objet compatible S3 (photos, PDF) |
 | Hébergement | Railway (front + API + PostgreSQL) |
 
@@ -87,7 +87,16 @@ npx prisma db seed       # crée le compte administrateur
 npm run dev              # démarre l'API sur http://localhost:4000
 ```
 
-Route de santé : `GET /api/health`. Des fichiers de tests HTTP (extension VS Code REST Client) sont fournis dans `backend/tests/`.
+Route de santé : `GET /api/health`. Des fichiers de tests HTTP (extension VS Code REST Client) sont fournis dans `backend/tests/` ; la connexion y pose un cookie de session que l'extension rejoue automatiquement.
+
+**Session et cookie.** Le jeton JWT n'est jamais exposé au JavaScript : il est transporté par un cookie `httpOnly`, ce qui neutralise le vol de session par XSS. Deux variables pilotent son comportement selon la forme du déploiement :
+
+| `COOKIE_SAMESITE` | Quand l'utiliser |
+| --- | --- |
+| `lax` (défaut) | Front et API sur le même domaine enregistrable — `app.exemple.fr` / `api.exemple.fr`, ou `localhost` en développement. |
+| `none` | Front et API sur deux sites distincts, par exemple deux sous-domaines `*.up.railway.app`. Le navigateur impose alors `Secure`, activé automatiquement. |
+
+`CORS_ORIGINE` liste les origines autorisées : une autorisation générique `*` est refusée par le navigateur dès qu'une requête porte des cookies. Un contrôle d'origine sur toutes les requêtes qui modifient des données protège de la CSRF, y compris en `SameSite=none`.
 
 ### Frontend (application web)
 
@@ -108,6 +117,7 @@ Les tokens de la charte graphique (couleurs, échelle typographique, pilules, ci
 - [x] Initialisation du backend (Express, routeur central, middlewares, gestion globale des erreurs)
 - [x] Authentification (inscription, connexion, détection de session) avec JWT et Argon2id
 - [x] Confirmation de l'adresse e-mail et mot de passe oublié (jetons à usage unique hachés en base)
+- [x] Session par cookie httpOnly (CORS restreint, contrôle d'origine anti-CSRF)
 - [x] Espace « Mon compte » : profil, mot de passe, export et suppression RGPD
 - [x] Initialisation du frontend (Next.js 16, tokens de la charte, client API)
 - [ ] Gestion des biens
