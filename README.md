@@ -120,6 +120,7 @@ Les tokens de la charte graphique (couleurs, échelle typographique, pilules, ci
 - [x] Session par cookie httpOnly (CORS restreint, contrôle d'origine anti-CSRF)
 - [x] Espace « Mon compte » : profil, mot de passe, export et suppression RGPD
 - [x] Initialisation du frontend (Next.js 16, tokens de la charte, client API)
+- [x] Écrans publics : accueil, authentification, pages légales, 404 et page d'erreur
 - [ ] Gestion des biens
 - [x] États des lieux : création, saisie pièce par pièce, photos horodatées (stockage objet R2)
 - [x] Double signature, verrouillage, génération et envoi du PDF (pdfkit, e-mails Brevo)
