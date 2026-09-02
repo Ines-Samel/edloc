@@ -12,6 +12,10 @@ Content-Type: application/json
 
 { "email": "camille@test.fr", "motDePasse": "MotDePasseTest12" }
 
+### 1b. Liste enrichie → chaque bien porte nombreEdl et dernierEdl (statut du dernier EDL),
+### et la réponse fournit la liste des communes pour le filtre déroulant (écran 7).
+GET {{baseUrl}}/biens
+
 ### 1. Création → attendu 201
 # @name creation
 POST {{baseUrl}}/biens

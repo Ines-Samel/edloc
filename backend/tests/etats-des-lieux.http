@@ -56,3 +56,9 @@ GET {{baseUrl}}/etats-des-lieux?idBien={{bien.response.body.idBien}}&dateDebut=2
 
 ### Date au mauvais format → attendu 400 "Paramètres invalides"
 GET {{baseUrl}}/etats-des-lieux?dateDebut=15-01-2026
+
+### Filtre par statut → attendu 200, uniquement les brouillons (indicateurs du tableau de bord)
+GET {{baseUrl}}/etats-des-lieux?statut=brouillon&limite=1
+
+### Statut inconnu → attendu 400 "Paramètres invalides"
+GET {{baseUrl}}/etats-des-lieux?statut=nimporte
