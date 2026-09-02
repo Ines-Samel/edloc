@@ -30,7 +30,9 @@ export function CadreAuthentification({
       {/* Panneau d'ambiance — desktop uniquement. La baseline n'apparaît que sur
           l'accueil et les écrans d'authentification, jamais dans la navigation. */}
       <aside className="hidden bg-sable lg:flex lg:w-1/2 lg:flex-col lg:items-center lg:justify-center lg:gap-6">
-        <LogoEdloc className="size-40" />
+        <Link href="/" aria-label="EDLoc — retour à l'accueil" className="rounded-carte">
+          <LogoEdloc className="size-40" />
+        </Link>
         <p className="text-titre-1 text-terracotta-fonce">EDLoc</p>
         <p className="text-courant text-brun">Votre état des lieux, en toute sérénité.</p>
       </aside>
@@ -38,7 +40,13 @@ export function CadreAuthentification({
       <div className="flex flex-1 items-center justify-center px-6 py-12 lg:w-1/2">
         <div className="w-full max-w-md sm:rounded-carte sm:bg-card sm:p-10 sm:shadow-sm lg:bg-transparent lg:p-0 lg:shadow-none">
           <div className="flex flex-col items-center gap-2 text-center">
-            <LogoEdloc className="size-16 lg:hidden" />
+            <Link
+              href="/"
+              aria-label="EDLoc — retour à l'accueil"
+              className="rounded-carte lg:hidden"
+            >
+              <LogoEdloc className="size-16" />
+            </Link>
             {marque ? (
               <div className="lg:hidden">
                 <p className="text-titre-2 text-terracotta-fonce">EDLoc</p>

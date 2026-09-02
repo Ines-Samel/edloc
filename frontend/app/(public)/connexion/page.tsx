@@ -50,7 +50,21 @@ export default function PageConnexion() {
   }
 
   return (
-    <CadreAuthentification titre="Connexion" marque>
+    <CadreAuthentification
+      titre="Connexion"
+      marque
+      pied={
+        <p className="text-legende text-brun">
+          Pas encore de compte ?{" "}
+          <Link
+            href="/inscription"
+            className="text-terracotta-fonce underline underline-offset-4"
+          >
+            Créer un compte
+          </Link>
+        </p>
+      }
+    >
       <form onSubmit={soumettre} noValidate className="flex flex-col gap-6">
         {messageErreur ? <Message ton="erreur">{messageErreur}</Message> : null}
 

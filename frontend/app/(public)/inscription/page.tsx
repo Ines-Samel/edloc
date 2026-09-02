@@ -70,6 +70,14 @@ export default function PageInscription() {
     <CadreAuthentification
       titre="Créer un compte"
       description="Quelques informations suffisent : vous recevrez un e-mail pour confirmer votre adresse."
+      pied={
+        <p className="text-legende text-brun">
+          Vous avez déjà un compte ?{" "}
+          <Link href="/connexion" className="text-terracotta-fonce underline underline-offset-4">
+            Se connecter
+          </Link>
+        </p>
+      }
     >
       <form onSubmit={soumettre} noValidate className="flex flex-col gap-6">
         {messageErreur ? <Message ton="erreur">{messageErreur}</Message> : null}
