@@ -25,6 +25,14 @@ export const inscriptionSchema = z.object({
   motDePasse,
 });
 
+// Le formulaire demande une confirmation ; l'API, elle, n'attend que motDePasse.
+export const inscriptionFormulaireSchema = inscriptionSchema
+  .extend({ confirmation: z.string().min(1, "Confirmez le mot de passe") })
+  .refine((valeurs) => valeurs.motDePasse === valeurs.confirmation, {
+    path: ["confirmation"],
+    message: "Les deux mots de passe ne correspondent pas",
+  });
+
 export const motDePasseOublieSchema = z.object({ email });
 
 export const reinitialisationSchema = z
@@ -41,6 +49,7 @@ export const renvoiConfirmationSchema = z.object({ email });
 
 export type ConnexionInput = z.infer<typeof connexionSchema>;
 export type InscriptionInput = z.infer<typeof inscriptionSchema>;
+export type InscriptionFormulaireInput = z.infer<typeof inscriptionFormulaireSchema>;
 export type MotDePasseOublieInput = z.infer<typeof motDePasseOublieSchema>;
 export type ReinitialisationInput = z.infer<typeof reinitialisationSchema>;
 export type RenvoiConfirmationInput = z.infer<typeof renvoiConfirmationSchema>;

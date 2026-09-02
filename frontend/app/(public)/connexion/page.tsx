@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { CadreAuthentification } from "@/components/layout/cadre-authentification";
 import { Button } from "@/components/ui/button";
 import { ChampFormulaire } from "@/components/ui/champ-formulaire";
+import { ChampMotDePasse } from "@/components/ui/champ-mot-de-passe";
 import { Message } from "@/components/ui/message";
 import { api } from "@/lib/api";
 import { erreursDepuisApi, valider, type ErreursChamps } from "@/lib/formulaire";
@@ -79,10 +80,9 @@ export default function PageConnexion() {
         />
 
         <div className="flex flex-col gap-2">
-          <ChampFormulaire
+          <ChampMotDePasse
             id="motDePasse"
             name="motDePasse"
-            type="password"
             libelle="Mot de passe"
             autoComplete="current-password"
             erreur={erreurs.motDePasse}

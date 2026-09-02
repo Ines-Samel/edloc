@@ -6,10 +6,11 @@ import Link from "next/link";
 import { CadreAuthentification } from "@/components/layout/cadre-authentification";
 import { Button } from "@/components/ui/button";
 import { ChampFormulaire } from "@/components/ui/champ-formulaire";
+import { ChampMotDePasse } from "@/components/ui/champ-mot-de-passe";
 import { Message } from "@/components/ui/message";
 import { api } from "@/lib/api";
 import { erreursDepuisApi, valider, type ErreursChamps } from "@/lib/formulaire";
-import { inscriptionSchema } from "@/schemas/auth.schema";
+import { inscriptionFormulaireSchema } from "@/schemas/auth.schema";
 
 export default function PageInscription() {
   const [erreurs, setErreurs] = useState<ErreursChamps>({});
@@ -22,7 +23,7 @@ export default function PageInscription() {
     const saisie = Object.fromEntries(new FormData(evenement.currentTarget));
     if (saisie.telephone === "") delete saisie.telephone;
 
-    const validation = valider(inscriptionSchema, saisie);
+    const validation = valider(inscriptionFormulaireSchema, saisie);
     if (!validation.succes) {
       setErreurs(validation.erreurs);
       setMessageErreur(null);
@@ -34,9 +35,12 @@ export default function PageInscription() {
     setEnvoiEnCours(true);
 
     try {
+      // La confirmation ne sert qu'au formulaire : elle n'est pas envoyée à l'API.
+      const { confirmation, ...compte } = validation.donnees;
+      void confirmation;
       const { message } = await api<{ message: string }>("/auth/inscription", {
         method: "POST",
-        body: validation.donnees,
+        body: compte,
       });
       // Réponse volontairement générique : elle ne dit pas si l'adresse existait déjà.
       setConfirmationEnvoyee(message);
@@ -123,14 +127,21 @@ export default function PageInscription() {
           erreur={erreurs.telephone}
         />
 
-        <ChampFormulaire
+        <ChampMotDePasse
           id="motDePasse"
           name="motDePasse"
-          type="password"
           libelle="Mot de passe"
           autoComplete="new-password"
           aide="12 caractères minimum."
           erreur={erreurs.motDePasse}
+        />
+
+        <ChampMotDePasse
+          id="confirmation"
+          name="confirmation"
+          libelle="Confirmation du mot de passe"
+          autoComplete="new-password"
+          erreur={erreurs.confirmation}
         />
 
         <Button type="submit" disabled={envoiEnCours} className="w-full">

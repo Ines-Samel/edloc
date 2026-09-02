@@ -9,7 +9,7 @@ import {
   LienRetourConnexion,
 } from "@/components/layout/cadre-authentification";
 import { Button } from "@/components/ui/button";
-import { ChampFormulaire } from "@/components/ui/champ-formulaire";
+import { ChampMotDePasse } from "@/components/ui/champ-mot-de-passe";
 import { Message } from "@/components/ui/message";
 import { api } from "@/lib/api";
 import { erreursDepuisApi, valider, type ErreursChamps } from "@/lib/formulaire";
@@ -87,20 +87,18 @@ function FormulaireReinitialisation() {
       <form onSubmit={soumettre} noValidate className="flex flex-col gap-6">
         {messageErreur ? <Message ton="erreur">{messageErreur}</Message> : null}
 
-        <ChampFormulaire
+        <ChampMotDePasse
           id="motDePasse"
           name="motDePasse"
-          type="password"
           libelle="Nouveau mot de passe"
           autoComplete="new-password"
           aide="12 caractères minimum."
           erreur={erreurs.motDePasse}
         />
 
-        <ChampFormulaire
+        <ChampMotDePasse
           id="confirmation"
           name="confirmation"
-          type="password"
           libelle="Confirmation"
           autoComplete="new-password"
           erreur={erreurs.confirmation}

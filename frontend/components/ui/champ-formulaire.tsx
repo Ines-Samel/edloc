@@ -13,12 +13,15 @@ export function ChampFormulaire({
   libelle,
   erreur,
   aide,
+  actionFin,
   ...props
 }: React.ComponentProps<typeof Input> & {
   id: string;
   libelle: string;
   erreur?: string;
   aide?: string;
+  /** Contrôle affiché à l'intérieur du champ, aligné à droite. */
+  actionFin?: React.ReactNode;
 }) {
   const idAide = `${id}-aide`;
   const idErreur = `${id}-erreur`;
@@ -27,12 +30,17 @@ export function ChampFormulaire({
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor={id}>{libelle}</Label>
-      <Input
-        id={id}
-        aria-invalid={erreur ? true : undefined}
-        aria-describedby={decritPar || undefined}
-        {...props}
-      />
+      <div className="relative">
+        <Input
+          id={id}
+          aria-invalid={erreur ? true : undefined}
+          aria-describedby={decritPar || undefined}
+          // Réserve la place de l'action pour que la saisie ne passe pas dessous.
+          className={actionFin ? "pr-14" : undefined}
+          {...props}
+        />
+        {actionFin}
+      </div>
       {aide ? (
         <p id={idAide} className="text-legende text-brun">
           {aide}
