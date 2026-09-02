@@ -68,8 +68,9 @@ export type EtatElement = keyof typeof ETATS_ELEMENT;
 export type Completude = keyof typeof COMPLETUDES;
 export type StatutEdl = keyof typeof STATUTS_EDL;
 
-function Pastille({ apparence }: { apparence: Apparence }) {
-  const { icone: Icone, libelle, classes } = apparence;
+function Pastille({ apparence, libelle: libellePersonnalise }: { apparence: Apparence; libelle?: string }) {
+  const { icone: Icone, libelle: libelleParDefaut, classes } = apparence;
+  const libelle = libellePersonnalise ?? libelleParDefaut;
 
   return (
     <span
@@ -85,8 +86,14 @@ export function PastilleEtatElement({ etat }: { etat: EtatElement }) {
   return <Pastille apparence={ETATS_ELEMENT[etat]} />;
 }
 
-export function PastilleCompletude({ completude }: { completude: Completude }) {
-  return <Pastille apparence={COMPLETUDES[completude]} />;
+export function PastilleCompletude({
+  completude,
+  libelle,
+}: {
+  completude: Completude;
+  libelle?: string;
+}) {
+  return <Pastille apparence={COMPLETUDES[completude]} libelle={libelle} />;
 }
 
 export function PastilleStatutEdl({ statut }: { statut: StatutEdl }) {
