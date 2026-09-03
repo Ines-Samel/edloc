@@ -4,11 +4,11 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
-import { PastilleCompletude, PastilleEtatElement } from "@/components/edl/pastille-etat";
+import { ListeRecapitulative } from "@/components/edl/liste-recapitulative";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/components/ui/message";
 import { api } from "@/lib/api";
-import { completudePiece, type EdlComplet } from "@/lib/edloc";
+import type { EdlComplet } from "@/lib/edloc";
 
 // Écran 10 : relecture avant signature, pièce par pièce.
 export default function PageRecapitulatif({ params }: { params: Promise<{ id: string }> }) {
@@ -52,37 +52,7 @@ export default function PageRecapitulatif({ params }: { params: Promise<{ id: st
         </p>
       </header>
 
-      {edl.pieces.map((piece) => (
-        <section key={piece.idPiece} className="rounded-carte border border-sable bg-card">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sable px-5 py-4">
-            <h2 className="text-sous-titre">{piece.libelle}</h2>
-            <PastilleCompletude completude={completudePiece(piece)} />
-          </div>
-
-          {piece.elements.length === 0 ? (
-            <p className="text-legende px-5 py-4 text-brun">
-              Aucun élément constaté dans cette pièce.
-            </p>
-          ) : (
-            <ul className="divide-y divide-sable">
-              {piece.elements.map((element) => (
-                <li
-                  key={element.idElement}
-                  className="flex flex-wrap items-center justify-between gap-3 px-5 py-3"
-                >
-                  <span className="text-courant flex-1">{element.libelle}</span>
-                  <PastilleEtatElement etat={element.etat} />
-                  <span className="text-legende w-20 text-right text-brun">
-                    {element.photos.length === 0
-                      ? "—"
-                      : `${element.photos.length} photo${element.photos.length > 1 ? "s" : ""}`}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      ))}
+      <ListeRecapitulative pieces={edl.pieces} />
 
       {aucunePiece ? (
         <Message ton="information">
