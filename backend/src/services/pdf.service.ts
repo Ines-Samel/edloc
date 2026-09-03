@@ -31,7 +31,8 @@ export async function genererEtStockerPdf(idEdl: string): Promise<string> {
         orderBy: { ordre: 'asc' },
         include: {
           elements: {
-            include: { photos: true },
+            orderBy: { libelle: 'asc' },
+            include: { photos: { orderBy: { dateHorodatage: 'asc' } } },
           },
         },
       },

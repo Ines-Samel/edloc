@@ -104,8 +104,10 @@ export async function exporterDonnees(idBailleur: string) {
                 orderBy: { ordre: 'asc' },
                 include: {
                   elements: {
+                    orderBy: { libelle: 'asc' },
                     include: {
                       photos: {
+                        orderBy: { dateHorodatage: 'asc' },
                         select: { idPhoto: true, dateHorodatage: true },
                       },
                     },

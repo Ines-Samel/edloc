@@ -1,5 +1,10 @@
 @baseUrl = http://localhost:4000/api
 
+### Authentification par cookie httpOnly : il n'y a plus d'en-tête Authorization.
+### L'extension REST Client conserve le cookie posé par la connexion et le rejoue
+### automatiquement. Exécuter d'abord la requête de connexion ci-dessous ; un seul
+### compte peut être connecté à la fois, le cookie étant remplacé à chaque connexion.
+
 ### 1. Route inconnue → attendu 404 "Ressource introuvable"
 GET {{baseUrl}}/nexiste-pas
 
