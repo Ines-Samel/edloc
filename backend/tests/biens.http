@@ -1,57 +1,57 @@
 @baseUrl = http://localhost:4000/api
 
-### 0. Connexion (préalable) → récupère le jeton
+### Authentification par cookie httpOnly : il n'y a plus d'en-tête Authorization.
+### L'extension REST Client conserve le cookie posé par la connexion et le rejoue
+### automatiquement. Exécuter d'abord la requête de connexion ci-dessous ; un seul
+### compte peut être connecté à la fois, le cookie étant remplacé à chaque connexion.
+
+### 0. Connexion (préalable) → pose le cookie de session
 # @name connexion
 POST {{baseUrl}}/auth/connexion
 Content-Type: application/json
 
 { "email": "camille@test.fr", "motDePasse": "MotDePasseTest12" }
 
+### 1b. Liste enrichie → chaque bien porte nombreEdl et dernierEdl (statut du dernier EDL),
+### et la réponse fournit la liste des communes pour le filtre déroulant (écran 7).
+GET {{baseUrl}}/biens
+
 ### 1. Création → attendu 201
 # @name creation
 POST {{baseUrl}}/biens
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "adresse": "12 rue des Lilas", "codePostal": "69003", "ville": "Lyon", "typeLogement": "Appartement", "nombrePieces": 3, "surface": 62.5 }
 
 ### 2. Code postal invalide → attendu 400 avec le message dédié
 POST {{baseUrl}}/biens
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "adresse": "1 place Test", "codePostal": "6900", "ville": "Lyon", "typeLogement": "Studio" }
 
 ### 3. Liste paginée → attendu 200 { donnees, pagination }
 GET {{baseUrl}}/biens?page=1&limite=2
-Authorization: Bearer {{connexion.response.body.jeton}}
 
 ### 4. Recherche → attendu : le bien de Lyon ressort
 GET {{baseUrl}}/biens?recherche=lilas
-Authorization: Bearer {{connexion.response.body.jeton}}
 
 ### 5. Filtre commune → attendu : biens de Lyon uniquement
 GET {{baseUrl}}/biens?commune=lyon
-Authorization: Bearer {{connexion.response.body.jeton}}
 
 ### 6. Détail → attendu 200
 GET {{baseUrl}}/biens/{{creation.response.body.idBien}}
-Authorization: Bearer {{connexion.response.body.jeton}}
 
 ### 7. Modification → attendu 200 avec la nouvelle adresse
 PUT {{baseUrl}}/biens/{{creation.response.body.idBien}}
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "adresse": "14 rue des Lilas", "codePostal": "69003", "ville": "Lyon", "typeLogement": "Appartement", "nombrePieces": 3, "surface": 62.5 }
 
 ### 8. UUID inconnu → attendu 404
 GET {{baseUrl}}/biens/00000000-0000-0000-0000-000000000000
-Authorization: Bearer {{connexion.response.body.jeton}}
 
 ### 9. Sans jeton → attendu 401
 GET {{baseUrl}}/biens
 
 ### 10. Suppression → attendu 204, puis rejouer le test 6 → 404
 DELETE {{baseUrl}}/biens/{{creation.response.body.idBien}}
-Authorization: Bearer {{connexion.response.body.jeton}}
