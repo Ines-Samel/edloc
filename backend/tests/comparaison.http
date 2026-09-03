@@ -1,5 +1,10 @@
 @baseUrl = http://localhost:4000/api
 
+### Authentification par cookie httpOnly : il n'y a plus d'en-tête Authorization.
+### L'extension REST Client conserve le cookie posé par la connexion et le rejoue
+### automatiquement. Exécuter d'abord la requête de connexion ci-dessous ; un seul
+### compte peut être connecté à la fois, le cookie étant remplacé à chaque connexion.
+
 ### 0. Connexion
 # @name connexion
 POST {{baseUrl}}/auth/connexion
@@ -10,7 +15,6 @@ Content-Type: application/json
 ### 1. Bien
 # @name bien
 POST {{baseUrl}}/biens
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "adresse": "3 rue de la Comparaison", "codePostal": "69004", "ville": "Lyon", "typeLogement": "Studio" }
@@ -18,7 +22,6 @@ Content-Type: application/json
 ### 2. EDL d'entrée
 # @name entree
 POST {{baseUrl}}/etats-des-lieux
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "idBien": "{{bien.response.body.idBien}}", "typeEdl": "entree", "locataire": { "nom": "Compare", "prenom": "Léa", "email": "lea.compare@test.fr" } }
@@ -26,35 +29,30 @@ Content-Type: application/json
 ### 3. Pièce Salon
 # @name salon
 POST {{baseUrl}}/etats-des-lieux/{{entree.response.body.idEdl}}/pieces
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "libelle": "Salon" }
 
 ### 4. Élément Mur (bon état à l'entrée)
 POST {{baseUrl}}/pieces/{{salon.response.body.idPiece}}/elements
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "libelle": "Mur principal", "etat": "bonEtat" }
 
 ### 5. Élément Fenêtre (neuf à l'entrée)
 POST {{baseUrl}}/pieces/{{salon.response.body.idPiece}}/elements
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "libelle": "Fenêtre", "etat": "neuf" }
 
 ### 6. Signature bailleur
 POST {{baseUrl}}/etats-des-lieux/{{entree.response.body.idEdl}}/signatures
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "roleSignataire": "bailleur", "donneesSignature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" }
 
 ### 7. Signature locataire → l'entrée est signée (l'e-mail vers l'adresse fictive échouera en logs : normal)
 POST {{baseUrl}}/etats-des-lieux/{{entree.response.body.idEdl}}/signatures
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "roleSignataire": "locataire", "donneesSignature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" }
@@ -62,7 +60,6 @@ Content-Type: application/json
 ### 8. EDL de sortie (pré-rempli)
 # @name sortie
 POST {{baseUrl}}/etats-des-lieux
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "idBien": "{{bien.response.body.idBien}}", "typeEdl": "sortie", "locataire": { "nom": "Compare", "prenom": "Léa", "email": "lea.compare@test.fr" } }
@@ -70,30 +67,24 @@ Content-Type: application/json
 ### 9. Détail de la sortie (pour récupérer les ids copiés)
 # @name sortieD
 GET {{baseUrl}}/etats-des-lieux/{{sortie.response.body.idEdl}}
-Authorization: Bearer {{connexion.response.body.jeton}}
 
 ### 10. Le Mur se dégrade → mauvais état
 PUT {{baseUrl}}/elements/{{sortieD.response.body.pieces[0].elements[0].idElement}}
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "libelle": "Mur principal", "etat": "mauvaisEtat", "commentaire": "Gros impact au centre" }
 
 ### 11. La Fenêtre disparaît de la sortie (→ nonConstate)
 DELETE {{baseUrl}}/elements/{{sortieD.response.body.pieces[0].elements[1].idElement}}
-Authorization: Bearer {{connexion.response.body.jeton}}
 
 ### 12. Une Plinthe apparaît (→ nouveau)
 POST {{baseUrl}}/pieces/{{sortieD.response.body.pieces[0].idPiece}}/elements
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: application/json
 
 { "libelle": "Plinthe", "etat": "etatUsage" }
 
 ### 13. LA COMPARAISON → attendu 200
 GET {{baseUrl}}/etats-des-lieux/{{sortie.response.body.idEdl}}/comparaison
-Authorization: Bearer {{connexion.response.body.jeton}}
 
 ### 14. Comparaison depuis l'ENTRÉE → attendu 422
 GET {{baseUrl}}/etats-des-lieux/{{entree.response.body.idEdl}}/comparaison
-Authorization: Bearer {{connexion.response.body.jeton}}
