@@ -102,8 +102,12 @@ export async function obtenirEdl(idBailleur: string, idEdl: string) {
       pieces: {
         orderBy: { ordre: 'asc' },
         include: {
+          // Ordre déterministe : sans tri explicite, PostgreSQL peut renvoyer les
+          // lignes dans un ordre différent après une mise à jour, et les cartes
+          // se réordonneraient sous les doigts pendant la saisie.
           elements: {
-            include: { photos: true },
+            orderBy: { libelle: 'asc' },
+            include: { photos: { orderBy: { dateHorodatage: 'asc' } } },
           },
         },
       },
