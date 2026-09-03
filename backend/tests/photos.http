@@ -1,5 +1,10 @@
 @baseUrl = http://localhost:4000/api
 
+### Authentification par cookie httpOnly : il n'y a plus d'en-tête Authorization.
+### L'extension REST Client conserve le cookie posé par la connexion et le rejoue
+### automatiquement. Exécuter d'abord la requête de connexion ci-dessous ; un seul
+### compte peut être connecté à la fois, le cookie étant remplacé à chaque connexion.
+
 ### 0. Connexion
 # @name connexion
 POST {{baseUrl}}/auth/connexion
@@ -10,7 +15,6 @@ Content-Type: application/json
 ### 1. Upload sur un élément (colle un idElement d'un EDL en brouillon) → attendu 201
 # @name photo
 POST {{baseUrl}}/elements/598a46df-abf6-439c-8fea-92efafec79cb/photos
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: multipart/form-data; boundary=----LimiteEDLoc
 
 ------LimiteEDLoc
@@ -22,11 +26,9 @@ Content-Type: image/jpeg
 
 ### 2. Récupération du fichier → attendu 200, l'image s'affiche dans l'onglet de réponse
 GET {{baseUrl}}/photos/{{photo.response.body.idPhoto}}/fichier
-Authorization: Bearer {{connexion.response.body.jeton}}
 
 ### 3. Mauvais format (renomme un .txt en champ photo) → attendu 400
 POST {{baseUrl}}/elements/598a46df-abf6-439c-8fea-92efafec79cb/photos
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: multipart/form-data; boundary=----LimiteEDLoc
 
 ------LimiteEDLoc
@@ -38,11 +40,9 @@ ceci n'est pas une image
 
 ### 4. Sans fichier → attendu 400 "Aucun fichier fourni"
 POST {{baseUrl}}/elements/598a46df-abf6-439c-8fea-92efafec79cb/photos
-Authorization: Bearer {{connexion.response.body.jeton}}
 Content-Type: multipart/form-data; boundary=----LimiteEDLoc
 
 ------LimiteEDLoc--
 
 ### 5. Suppression → attendu 204 (puis rejouer le 2 → 404)
 DELETE {{baseUrl}}/photos/{{photo.response.body.idPhoto}}
-Authorization: Bearer {{connexion.response.body.jeton}}
