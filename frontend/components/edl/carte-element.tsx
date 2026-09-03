@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 
 import type { EtatElement } from "@/components/edl/pastille-etat";
+import { GaleriePhotos } from "@/components/edl/galerie-photos";
 import { SelecteurEtat } from "@/components/edl/selecteur-etat";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -19,11 +20,13 @@ export function CarteElement({
   verrouille,
   onEnregistrer,
   onSupprimer,
+  onRecharger,
 }: {
   element: ElementEdl;
   verrouille: boolean;
   onEnregistrer: (modifications: { etat?: EtatElement; commentaire?: string }) => Promise<void>;
   onSupprimer: () => Promise<void>;
+  onRecharger: () => Promise<void>;
 }) {
   const commentaireServeur = element.commentaire ?? "";
   const [commentaire, setCommentaire] = useState(commentaireServeur);
@@ -78,6 +81,14 @@ export function CarteElement({
           className="text-courant w-full rounded-carte border border-input bg-card px-4 py-3 placeholder:text-brun disabled:bg-sable"
         />
       </div>
+
+      <GaleriePhotos
+        idElement={element.idElement}
+        libelleElement={element.libelle}
+        photos={element.photos}
+        verrouille={verrouille}
+        onChangement={onRecharger}
+      />
     </article>
   );
 }

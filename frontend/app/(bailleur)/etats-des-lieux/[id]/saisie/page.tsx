@@ -165,6 +165,7 @@ export default function PageSaisie({ params }: { params: Promise<{ id: string }>
                   onSupprimer={() =>
                     agir(() => api(`/elements/${element.idElement}`, { method: "DELETE" }))
                   }
+                  onRecharger={recharger}
                 />
               ))}
 
