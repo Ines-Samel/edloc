@@ -102,8 +102,12 @@ export async function obtenirEdl(idBailleur: string, idEdl: string) {
       pieces: {
         orderBy: { ordre: 'asc' },
         include: {
+          // Ordre déterministe : sans tri explicite, PostgreSQL peut renvoyer les
+          // lignes dans un ordre différent après une mise à jour, et les cartes
+          // se réordonneraient sous les doigts pendant la saisie.
           elements: {
-            include: { photos: true },
+            orderBy: { libelle: 'asc' },
+            include: { photos: { orderBy: { dateHorodatage: 'asc' } } },
           },
         },
       },
@@ -166,12 +170,16 @@ export async function listerEdlParBien(idBailleur: string, idBien: string) {
 // Liste transversale : tous les états des lieux du bailleur, biens confondus,
 // avec filtres optionnels par bien et par période.
 export async function listerEdl(idBailleur: string, query: ListeEdlQuery) {
-  const { idBien, dateDebut, dateFin, page, limite } = query;
+  const { idBien, statut, dateDebut, dateFin, page, limite } = query;
 
   const where: Prisma.EtatDesLieuxWhereInput = { bien: { idBailleur } };
 
   if (idBien) {
     where.idBien = idBien;
+  }
+
+  if (statut) {
+    where.statut = statut;
   }
 
   if (dateDebut || dateFin) {

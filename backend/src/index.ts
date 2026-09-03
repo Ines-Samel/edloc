@@ -1,14 +1,21 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { prisma } from './lib/prisma';
 import { appRoutes } from './routes/app.routes';
 import { ressourceIntrouvable, gestionErreurs } from './middlewares/erreurs';
+import { verifierOrigine, ORIGINES_AUTORISEES } from './middlewares/origine';
 
 // Création de l'application Express
 const app = express();
-app.use(cors());
+
+// Le cookie d'authentification impose une liste d'origines explicite : avec
+// credentials, le navigateur refuse une autorisation générique « * ».
+app.use(cors({ origin: ORIGINES_AUTORISEES, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
+app.use(verifierOrigine);
 
 app.use('/api', appRoutes);
 
