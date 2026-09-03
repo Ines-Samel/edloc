@@ -25,6 +25,7 @@ export const modificationEdlSchema = z.object({
 
 export const listeEdlQuerySchema = z.object({
   idBien: z.string().uuid().optional(),
+  statut: z.enum(['brouillon', 'signe']).optional(),
   dateDebut: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'La date doit être au format AAAA-MM-JJ')
