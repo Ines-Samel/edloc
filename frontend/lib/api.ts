@@ -1,4 +1,6 @@
-const BASE_API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+// Exportée pour les liens ouverts directement par le navigateur (PDF, photos) :
+// le cookie de session part avec la requête, sans passer par le client fetch.
+export const BASE_API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
 export type DetailValidation = { champ: string; message: string };
 
