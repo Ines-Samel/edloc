@@ -18,7 +18,7 @@ export function CadreDocument({
   return (
     <>
       <EntetePublique />
-      <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-12">
+      <main id="contenu-principal" tabIndex={-1} className="mx-auto w-full max-w-2xl flex-1 px-6 py-12">
         <h1 className="text-titre-1">{titre}</h1>
         <p className="text-legende mt-2 text-brun">Dernière mise à jour : {miseAJour}</p>
         <div className="mt-10 flex flex-col gap-10">{children}</div>

@@ -36,7 +36,7 @@ export default function PageAccueil() {
     <>
       <EntetePublique ancres />
 
-      <main className="flex-1">
+      <main id="contenu-principal" tabIndex={-1} className="flex-1">
         {/* Hero — un seul bouton principal, la connexion restant en action secondaire
             dans l'en-tête (charte §4). */}
         <section className="mx-auto flex max-w-6xl flex-col gap-10 px-6 py-14 lg:flex-row lg:items-center lg:gap-16">

@@ -11,14 +11,18 @@ export default function PageIntrouvable() {
   return (
     <>
       <EntetePublique />
-
-      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-6 px-6 py-16 text-center">
+      <main
+        id="contenu-principal"
+        tabIndex={-1}
+        className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-6 px-6 py-16 text-center"
+      >
         <LogoEdloc className="size-20" />
         <p className="text-titre-1 text-terracotta-fonce">404</p>
         <h1 className="text-titre-2">Cette page n&apos;existe pas</h1>
         <p className="text-courant text-brun">
-          Le lien est peut-être incomplet, ou la page a été déplacée. Rien n&apos;est perdu : vos
-          états des lieux restent accessibles depuis votre espace.
+          Le lien est peut-être incomplet, ou la page a été déplacée. Rien
+          n&apos;est perdu : vos états des lieux restent accessibles depuis
+          votre espace.
         </p>
 
         <div className="flex flex-col gap-4 sm:flex-row">

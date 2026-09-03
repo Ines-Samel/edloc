@@ -25,13 +25,17 @@ export default function PageErreur({
   }, [error]);
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-6 px-6 py-16 text-center">
+    <main
+      id="contenu-principal"
+      tabIndex={-1}
+      className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-6 px-6 py-16 text-center"
+    >
       <LogoEdloc className="size-20" />
       <h1 className="text-titre-2">Une erreur est survenue</h1>
 
       <Message ton="erreur">
-        L&apos;affichage de cette page a échoué. Votre saisie n&apos;est pas perdue : réessayez, ou
-        revenez à l&apos;accueil.
+        L&apos;affichage de cette page a échoué. Votre saisie n&apos;est pas
+        perdue : réessayez, ou revenez à l&apos;accueil.
       </Message>
 
       <div className="flex flex-col gap-4 sm:flex-row">
@@ -42,7 +46,9 @@ export default function PageErreur({
       </div>
 
       {error.digest ? (
-        <p className="text-legende text-brun">Référence de l&apos;incident : {error.digest}</p>
+        <p className="text-legende text-brun">
+          Référence de l&apos;incident : {error.digest}
+        </p>
       ) : null}
     </main>
   );

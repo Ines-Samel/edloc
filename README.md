@@ -127,7 +127,8 @@ Les tokens de la charte graphique (couleurs, échelle typographique, pilules, ci
 - [x] Détection de la perte de réseau signalée à l'utilisateur
 - [x] États des lieux : création, saisie pièce par pièce, photos horodatées (stockage objet R2)
 - [x] Double signature, verrouillage, génération et envoi du PDF (pdfkit, e-mails Brevo)
-- [ ] Tests, accessibilité, déploiement Railway
+- [x] Accessibilité : lien d'évitement, titres de page, parcours clavier, zoom 200 %
+- [ ] Mise à jour des livrables de conception et déploiement Railway
 
 ## Évolutions envisagées
 

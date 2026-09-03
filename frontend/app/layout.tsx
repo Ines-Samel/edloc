@@ -3,6 +3,7 @@ import { Nunito_Sans } from "next/font/google";
 import "./globals.css";
 
 import { BandeauReseau } from "@/components/layout/bandeau-reseau";
+import { LienEvitement } from "@/components/layout/lien-evitement";
 
 // Police unique de la charte, avec ses quatre graisses.
 const nunitoSans = Nunito_Sans({
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="fr" className={`${nunitoSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         {/* Le bandeau surveille la connexion sur toutes les pages, publiques comprises. */}
+        <LienEvitement />
         <BandeauReseau />
         {children}
       </body>

@@ -20,7 +20,7 @@ export default function LayoutAdmin({ children }: { children: React.ReactNode })
           </Link>
           <MenuCompte />
         </header>
-        <main className="flex-1 px-6 py-6">{children}</main>
+        <main id="contenu-principal" tabIndex={-1} className="flex-1 px-6 py-6">{children}</main>
       </div>
     </GardeSession>
   );

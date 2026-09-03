@@ -13,7 +13,7 @@ export default function LayoutBailleur({ children }: { children: React.ReactNode
         <BarreLaterale />
         <div className="flex min-w-0 flex-1 flex-col">
           <EnteteApplication />
-          <main className="flex-1 px-4 py-6 sm:px-6">{children}</main>
+          <main id="contenu-principal" tabIndex={-1} className="flex-1 px-4 py-6 sm:px-6">{children}</main>
           <BarreOnglets />
         </div>
       </div>

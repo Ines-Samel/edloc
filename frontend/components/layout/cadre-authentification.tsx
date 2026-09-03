@@ -26,7 +26,7 @@ export function CadreAuthentification({
   pied?: React.ReactNode;
 }) {
   return (
-    <main className="flex flex-1 flex-col lg:flex-row">
+    <main id="contenu-principal" tabIndex={-1} className="flex flex-1 flex-col lg:flex-row">
       {/* Panneau d'ambiance — desktop uniquement. La baseline n'apparaît que sur
           l'accueil et les écrans d'authentification, jamais dans la navigation. */}
       <aside className="hidden bg-sable lg:flex lg:w-1/2 lg:flex-col lg:items-center lg:justify-center lg:gap-6">
