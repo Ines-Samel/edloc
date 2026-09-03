@@ -2,7 +2,7 @@
  * Types des ressources renvoyées par l'API, et helpers d'affichage partagés par
  * les écrans de l'espace bailleur.
  */
-import type { Completude, StatutEdl } from "@/components/edl/pastille-etat";
+import type { Completude, EtatElement, StatutEdl } from "@/components/edl/pastille-etat";
 
 export type Pagination = { page: number; limite: number; total: number; totalPages: number };
 
@@ -62,4 +62,46 @@ export function avancementBien(bien: Bien): { completude: Completude; libelle: s
     completude: "complet",
     libelle: bien.nombreEdl === 1 ? "1 état des lieux" : `${bien.nombreEdl} états des lieux`,
   };
+}
+
+export type Photo = { idPhoto: string; dateHorodatage: string };
+
+export type ElementEdl = {
+  idElement: string;
+  libelle: string;
+  etat: EtatElement;
+  commentaire: string | null;
+  photos: Photo[];
+};
+
+export type PieceEdl = {
+  idPiece: string;
+  libelle: string;
+  ordre: number | null;
+  elements: ElementEdl[];
+};
+
+export type EdlComplet = {
+  idEdl: string;
+  typeEdl: "entree" | "sortie";
+  statut: StatutEdl;
+  dateEdl: string;
+  dateSignature: string | null;
+  bien: Bien;
+  locataire: { nom: string; prenom: string; email: string | null };
+  pieces: PieceEdl[];
+  signatures: { roleSignataire: "bailleur" | "locataire"; dateSignature: string }[];
+};
+
+/*
+ * Complétude d'une pièce. RG8 impose qu'un élément porte toujours un état : une
+ * pièce est donc considérée renseignée dès qu'elle contient au moins un élément,
+ * et à compléter tant qu'elle est vide.
+ */
+export function completudePiece(piece: PieceEdl): Completude {
+  return piece.elements.length > 0 ? "complet" : "aCompleter";
+}
+
+export function piecesRenseignees(pieces: PieceEdl[]): number {
+  return pieces.filter((piece) => completudePiece(piece) === "complet").length;
 }
