@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { NOM_COOKIE_JETON, optionsCookieJeton, optionsCookieAvecDuree } from '../lib/cookies';
 import {
   inscrire,
   connecter,
@@ -51,7 +52,10 @@ export async function connexion(req: Request, res: Response): Promise<void> {
     res.status(403).json({ erreur: 'Votre compte a été désactivé' });
     return;
   }
-  res.status(200).json({ jeton: resultat.jeton, role: resultat.role });
+  // Le jeton part dans un cookie httpOnly et n'apparaît jamais dans le corps de
+  // la réponse : le JavaScript de la page ne peut donc ni le lire ni le stocker.
+  res.cookie(NOM_COOKIE_JETON, resultat.jeton, optionsCookieAvecDuree());
+  res.status(200).json({ role: resultat.role });
 }
 
 export async function confirmation(req: Request, res: Response): Promise<void> {
@@ -90,6 +94,12 @@ export async function reinitialisation(req: Request, res: Response): Promise<voi
   res
     .status(200)
     .json({ message: 'Votre mot de passe a été modifié. Vous pouvez maintenant vous connecter.' });
+}
+
+export async function deconnexion(_req: Request, res: Response): Promise<void> {
+  // clearCookie n'efface que si les options correspondent à celles de la pose.
+  res.clearCookie(NOM_COOKIE_JETON, optionsCookieJeton());
+  res.status(204).send();
 }
 
 export async function me(req: Request, res: Response): Promise<void> {
