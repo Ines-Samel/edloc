@@ -122,11 +122,10 @@ Les tokens de la charte graphique (couleurs, échelle typographique, pilules, ci
 - [x] Initialisation du frontend (Next.js 16, tokens de la charte, client API)
 - [x] Écrans publics : accueil, authentification, pages légales, 404 et page d'erreur
 - [x] Zones protégées : garde de session, navigation dans les trois formats, déconnexion
-- [ ] Gestion des biens
+- [x] Écrans bailleur : tableau de bord, biens, parcours d'état des lieux, comparaison, historique, compte
+- [x] Écran d'administration (comptes, activation, suppression RGPD)
 - [x] États des lieux : création, saisie pièce par pièce, photos horodatées (stockage objet R2)
 - [x] Double signature, verrouillage, génération et envoi du PDF (pdfkit, e-mails Brevo)
-- [ ] Comparaison entrée / sortie
-- [ ] Écran d'administration
 - [ ] Tests, accessibilité, déploiement Railway
 
 ## Évolutions envisagées
