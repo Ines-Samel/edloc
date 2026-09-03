@@ -16,6 +16,7 @@ import {
   renvoiConfirmation,
   motDePasseOublie,
   reinitialisation,
+  deconnexion,
   me,
 } from '../controllers/auth.controller';
 
@@ -27,4 +28,5 @@ authRoutes.post('/confirmation', valider(confirmationSchema), confirmation);
 authRoutes.post('/renvoyer-confirmation', valider(renvoiConfirmationSchema), renvoiConfirmation);
 authRoutes.post('/mot-de-passe-oublie', valider(motDePasseOublieSchema), motDePasseOublie);
 authRoutes.post('/reinitialisation', valider(reinitialisationSchema), reinitialisation);
+authRoutes.post('/deconnexion', deconnexion);
 authRoutes.get('/me', authJwt, me);
