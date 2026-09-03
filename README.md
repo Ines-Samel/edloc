@@ -89,7 +89,18 @@ npm run dev              # démarre l'API sur http://localhost:4000
 
 Route de santé : `GET /api/health`. Des fichiers de tests HTTP (extension VS Code REST Client) sont fournis dans `backend/tests/`.
 
-> 🚧 Le frontend (Next.js) sera initialisé avec les premiers écrans.
+### Frontend (application web)
+
+Prérequis : Node.js ≥ 20, l'API démarrée.
+
+```bash
+cd frontend
+npm install
+cp .env.example .env.local   # NEXT_PUBLIC_API_URL pointe vers l'API
+npm run dev                  # démarre l'application sur http://localhost:3000
+```
+
+Les tokens de la charte graphique (couleurs, échelle typographique, pilules, cible tactile de 48 px) sont déclarés en CSS dans `app/globals.css` : Tailwind v4 n'utilise plus de fichier `tailwind.config.ts`.
 
 ## Feuille de route du développement
 
@@ -98,7 +109,7 @@ Route de santé : `GET /api/health`. Des fichiers de tests HTTP (extension VS Co
 - [x] Authentification (inscription, connexion, détection de session) avec JWT et Argon2id
 - [x] Confirmation de l'adresse e-mail et mot de passe oublié (jetons à usage unique hachés en base)
 - [x] Espace « Mon compte » : profil, mot de passe, export et suppression RGPD
-- [ ] Initialisation du frontend (Next.js, tokens de la charte)
+- [x] Initialisation du frontend (Next.js 16, tokens de la charte, client API)
 - [ ] Gestion des biens
 - [x] États des lieux : création, saisie pièce par pièce, photos horodatées (stockage objet R2)
 - [x] Double signature, verrouillage, génération et envoi du PDF (pdfkit, e-mails Brevo)
