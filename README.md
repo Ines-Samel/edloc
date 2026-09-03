@@ -124,6 +124,7 @@ Les tokens de la charte graphique (couleurs, échelle typographique, pilules, ci
 - [x] Zones protégées : garde de session, navigation dans les trois formats, déconnexion
 - [x] Écrans bailleur : tableau de bord, biens, parcours d'état des lieux, comparaison, historique, compte
 - [x] Écran d'administration (comptes, activation, suppression RGPD)
+- [x] Détection de la perte de réseau signalée à l'utilisateur
 - [x] États des lieux : création, saisie pièce par pièce, photos horodatées (stockage objet R2)
 - [x] Double signature, verrouillage, génération et envoi du PDF (pdfkit, e-mails Brevo)
 - [ ] Tests, accessibilité, déploiement Railway
