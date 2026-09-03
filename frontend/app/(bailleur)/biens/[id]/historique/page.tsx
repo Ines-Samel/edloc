@@ -2,9 +2,10 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, FileText } from "lucide-react";
+import { ChevronLeft, FileText, SquarePen } from "lucide-react";
 
 import { PastilleStatutEdl } from "@/components/edl/pastille-etat";
+import { SuppressionBien } from "@/components/biens/suppression-bien";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/components/ui/message";
 import { BASE_API, api } from "@/lib/api";
@@ -58,9 +59,21 @@ export default function PageHistoriqueBien({ params }: { params: Promise<{ id: s
       {erreur ? <Message ton="erreur">{erreur}</Message> : null}
 
       {bien ? (
-        <header className="flex flex-col gap-1 rounded-carte border border-sable bg-card px-5 py-4">
-          <h1 className="text-titre-2">{bien.adresse}</h1>
-          <p className="text-legende text-brun">{descriptifBien(bien)}</p>
+        <header className="flex flex-col gap-4 rounded-carte border border-sable bg-card px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-titre-2">{bien.adresse}</h1>
+            <p className="text-legende text-brun">{descriptifBien(bien)}</p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/biens/${id}/modifier`}>
+                <SquarePen aria-hidden className="size-4" />
+                Modifier
+              </Link>
+            </Button>
+            <SuppressionBien idBien={id} nombreEdl={lignes?.length ?? 0} />
+          </div>
         </header>
       ) : null}
 
