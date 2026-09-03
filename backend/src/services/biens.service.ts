@@ -20,18 +20,41 @@ export async function listerBiens(idBailleur: string, query: ListeBiensQuery) {
 
   const skip = (page - 1) * limite;
 
-  const [donnees, total] = await Promise.all([
+  const [biens, total, communesDistinctes] = await Promise.all([
     prisma.bien.findMany({
       where,
       orderBy: [{ ville: 'asc' }, { adresse: 'asc' }],
       skip,
       take: limite,
+      include: {
+        // La carte d'un bien affiche le statut de son dernier état des lieux (écran 7).
+        _count: { select: { etatsDesLieux: true } },
+        etatsDesLieux: {
+          orderBy: [{ dateEdl: 'desc' }],
+          take: 1,
+          select: { idEdl: true, typeEdl: true, statut: true, dateEdl: true },
+        },
+      },
     }),
     prisma.bien.count({ where }),
+    // Alimente la liste déroulante « Commune », indépendante de la recherche en cours.
+    prisma.bien.findMany({
+      where: { idBailleur },
+      distinct: ['ville'],
+      orderBy: { ville: 'asc' },
+      select: { ville: true },
+    }),
   ]);
+
+  const donnees = biens.map(({ _count, etatsDesLieux, ...bien }) => ({
+    ...bien,
+    nombreEdl: _count.etatsDesLieux,
+    dernierEdl: etatsDesLieux[0] ?? null,
+  }));
 
   return {
     donnees,
+    communes: communesDistinctes.map((b) => b.ville),
     pagination: {
       page,
       limite,
