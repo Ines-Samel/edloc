@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
 import { ListeRecapitulative } from "@/components/edl/liste-recapitulative";
+import { EtapesEdl } from "@/components/edl/etapes-edl";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/components/ui/message";
 import { api } from "@/lib/api";
@@ -43,6 +44,8 @@ export default function PageRecapitulatif({ params }: { params: Promise<{ id: st
         <ChevronLeft aria-hidden className="size-4" />
         Retour à la saisie
       </Link>
+
+      <EtapesEdl etapeCourante="recapitulatif" />
 
       <header className="flex flex-col gap-1">
         <h1 className="text-titre-1">Récapitulatif</h1>

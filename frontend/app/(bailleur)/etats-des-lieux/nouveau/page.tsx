@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { EtapesEdl } from "@/components/edl/etapes-edl";
 import { Button } from "@/components/ui/button";
 import { ChampFormulaire } from "@/components/ui/champ-formulaire";
 import { Label } from "@/components/ui/label";
@@ -68,7 +69,7 @@ function FormulaireNouvelEdl() {
         method: "POST",
         body: validation.donnees,
       });
-      router.push(`/etats-des-lieux/${edl.idEdl}/saisie`);
+      router.push(`/etats-des-lieux/${edl.idEdl}/pieces`);
     } catch (erreur) {
       const { message, champs } = erreursDepuisApi(erreur);
       setMessageErreur(message);
@@ -176,7 +177,7 @@ function FormulaireNouvelEdl() {
       </fieldset>
 
       <Button type="submit" disabled={envoiEnCours || !idBien} className="w-full">
-        {envoiEnCours ? "Création en cours…" : "Commencer l'état des lieux"}
+        {envoiEnCours ? "Création en cours…" : "Suivant : choisir les pièces"}
       </Button>
     </form>
   );
@@ -186,6 +187,7 @@ function FormulaireNouvelEdl() {
 export default function PageNouvelEdl() {
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+      <EtapesEdl etapeCourante="informations" />
       <h1 className="text-titre-1">Nouvel état des lieux</h1>
       <Suspense>
         <FormulaireNouvelEdl />
