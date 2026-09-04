@@ -76,7 +76,7 @@ export function SuppressionEdl({
         <AlertDialogFooter>
           <AlertDialogCancel>Continuer la saisie</AlertDialogCancel>
           <Button variant="destructive" onClick={supprimer} disabled={enCours}>
-            {enCours ? "Suppression…" : "Abandonner définitivement"}
+            {enCours ? "Suppression…" : "Oui, abandonner"}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
