@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { NOM_COOKIE_JETON } from '../lib/cookies';
 
 export interface JetonPayload {
   sub: string;
@@ -13,14 +14,14 @@ declare module 'express-serve-static-core' {
 }
 
 export function authJwt(req: Request, res: Response, next: NextFunction): void {
-  const authHeader = req.headers.authorization;
+  // Le jeton n'est plus lu dans un en-tête Authorization : il arrive par le cookie
+  // httpOnly posé à la connexion, hors de portée du JavaScript de la page.
+  const jeton = req.cookies?.[NOM_COOKIE_JETON];
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!jeton) {
     res.status(401).json({ erreur: 'Authentification requise' });
     return;
   }
-
-  const jeton = authHeader.slice(7);
 
   try {
     const payload = jwt.verify(jeton, process.env.JWT_SECRET!) as JetonPayload;
