@@ -4,6 +4,12 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 
 import type { EtatElement } from "@/components/edl/pastille-etat";
+import {
+  composerLibelle,
+  materiauDe,
+  materiauxPour,
+  nomDeBase,
+} from "@/components/edl/catalogue-pieces";
 import { GaleriePhotos } from "@/components/edl/galerie-photos";
 import { SelecteurEtat } from "@/components/edl/selecteur-etat";
 import { Button } from "@/components/ui/button";
@@ -24,10 +30,18 @@ export function CarteElement({
 }: {
   element: ElementEdl;
   verrouille: boolean;
-  onEnregistrer: (modifications: { etat?: EtatElement; commentaire?: string }) => Promise<void>;
+  onEnregistrer: (modifications: {
+    etat?: EtatElement;
+    commentaire?: string;
+    libelle?: string;
+  }) => Promise<void>;
   onSupprimer: () => Promise<void>;
   onRecharger: () => Promise<void>;
 }) {
+  const base = nomDeBase(element.libelle);
+  const materiau = materiauDe(element.libelle);
+  const materiauxDisponibles = materiauxPour(element.libelle);
+
   const commentaireServeur = element.commentaire ?? "";
   const [commentaire, setCommentaire] = useState(commentaireServeur);
   const [dernierRecu, setDernierRecu] = useState(commentaireServeur);
@@ -43,7 +57,10 @@ export function CarteElement({
   return (
     <article className="flex flex-col gap-4 rounded-carte border border-sable bg-card p-5">
       <div className="flex items-start justify-between gap-4">
-        <h3 className="text-sous-titre">{element.libelle}</h3>
+        <h3 className="text-sous-titre">
+          {base}
+          {materiau ? <span className="font-normal text-brun"> — {materiau}</span> : null}
+        </h3>
         {!verrouille ? (
           <Button
             variant="destructive"
@@ -62,6 +79,30 @@ export function CarteElement({
         desactive={verrouille}
         onChanger={(etat) => onEnregistrer({ etat })}
       />
+
+      {materiauxDisponibles ? (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor={`materiau-${element.idElement}`}>Matériau</Label>
+          <select
+            id={`materiau-${element.idElement}`}
+            value={materiau ?? ""}
+            disabled={verrouille}
+            onChange={(evenement) =>
+              onEnregistrer({
+                libelle: composerLibelle(base, evenement.target.value || null),
+              })
+            }
+            className="text-courant h-cible w-full rounded-carte border border-input bg-card px-4 disabled:bg-sable sm:w-64"
+          >
+            <option value="">Non précisé</option>
+            {materiauxDisponibles.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-2">
         <Label htmlFor={`commentaire-${element.idElement}`} className="sr-only">

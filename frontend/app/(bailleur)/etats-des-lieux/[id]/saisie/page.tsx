@@ -172,7 +172,7 @@ export default function PageSaisie({
                       api(`/elements/${element.idElement}`, {
                         method: "PUT",
                         body: {
-                          libelle: element.libelle,
+                          libelle: modifications.libelle ?? element.libelle,
                           etat: modifications.etat ?? element.etat,
                           commentaire:
                             modifications.commentaire ??

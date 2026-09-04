@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Plus } from "lucide-react";
 
-import { CATALOGUE_PIECES } from "@/components/edl/catalogue-pieces";
+import { CATALOGUE_PIECES, elementsAutomatiques } from "@/components/edl/catalogue-pieces";
 import { EtapesEdl } from "@/components/edl/etapes-edl";
 import { Button } from "@/components/ui/button";
 import { ChampFormulaire } from "@/components/ui/champ-formulaire";
@@ -81,10 +81,22 @@ export default function PageChoixPieces({ params }: { params: Promise<{ id: stri
     try {
       const existantes = edl!.pieces;
 
-      // Créer les pièces nouvellement cochées, dans l'ordre de la sélection.
+      // Créer les pièces nouvellement cochées, dans l'ordre de la sélection, avec
+      // les éléments qu'elles comportent nécessairement : un sol, des murs et un
+      // plafond n'ont pas à être saisis à la main.
       for (const libelle of selection) {
-        if (!existantes.some((piece) => normaliser(piece.libelle) === normaliser(libelle))) {
-          await api(`/etats-des-lieux/${id}/pieces`, { method: "POST", body: { libelle } });
+        if (existantes.some((piece) => normaliser(piece.libelle) === normaliser(libelle))) continue;
+
+        const piece = await api<{ idPiece: string }>(`/etats-des-lieux/${id}/pieces`, {
+          method: "POST",
+          body: { libelle },
+        });
+
+        for (const element of elementsAutomatiques(libelle)) {
+          await api(`/pieces/${piece.idPiece}/elements`, {
+            method: "POST",
+            body: { libelle: element, etat: "bonEtat" },
+          });
         }
       }
 
@@ -116,8 +128,9 @@ export default function PageChoixPieces({ params }: { params: Promise<{ id: stri
       <header className="flex flex-col gap-2">
         <h1 className="text-titre-1">Quelles pièces allez-vous constater ?</h1>
         <p className="text-courant text-brun">
-          Cochez ce que comprend le logement. N&apos;oubliez pas les dépendances, les clés et les
-          compteurs : ils font partie de l&apos;état des lieux. Vous pourrez tout ajuster ensuite.
+          Cochez ce que comprend le logement. Chaque pièce arrive avec ses éléments certains —
+          sol, murs, plafond — déjà créés ; vous compléterez le reste à la saisie. N&apos;oubliez
+          pas les dépendances, les clés et les compteurs : ils font partie de l&apos;état des lieux.
         </p>
       </header>
 
@@ -156,7 +169,9 @@ export default function PageChoixPieces({ params }: { params: Promise<{ id: stri
                       <span className="text-legende text-brun">
                         {remplie
                           ? "Déjà renseignée"
-                          : `${piece.elements.length} éléments proposés`}
+                          : piece.auto.length > 0
+                            ? `${piece.auto.join(", ")} créés d'office`
+                            : `${piece.proposes.length} éléments proposés`}
                       </span>
                     </span>
                   </label>
