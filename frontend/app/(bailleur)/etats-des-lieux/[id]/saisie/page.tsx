@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import { CarteElement } from "@/components/edl/carte-element";
 import { elementsProposes } from "@/components/edl/catalogue-pieces";
 import { ColonnePieces } from "@/components/edl/colonne-pieces";
+import { SuppressionEdl } from "@/components/edl/suppression-edl";
 import { SelecteurEtat } from "@/components/edl/selecteur-etat";
 import type { EtatElement } from "@/components/edl/pastille-etat";
 import { EtapesEdl } from "@/components/edl/etapes-edl";
@@ -88,9 +89,14 @@ export default function PageSaisie({
             {edl.bien.adresse} —{" "}
             {edl.typeEdl === "entree" ? "entrée" : "sortie"}
           </h1>
-          <p className="text-legende text-brun">
-            {edl.locataire.prenom} {edl.locataire.nom}
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-legende text-brun">
+              {edl.locataire.prenom} {edl.locataire.nom}
+            </p>
+            {!verrouille ? (
+              <SuppressionEdl idEdl={id} nombrePieces={pieces.length} variante="outline" />
+            ) : null}
+          </div>
         </div>
 
         {/* Progression : pièces renseignées sur le total (RG10). */}

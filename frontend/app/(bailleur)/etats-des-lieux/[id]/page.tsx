@@ -6,6 +6,7 @@ import { FileText, Mail, PenLine, Scale } from "lucide-react";
 
 import { ListeRecapitulative } from "@/components/edl/liste-recapitulative";
 import { PastilleStatutEdl } from "@/components/edl/pastille-etat";
+import { SuppressionEdl } from "@/components/edl/suppression-edl";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/components/ui/message";
 import { BASE_API, api } from "@/lib/api";
@@ -88,6 +89,7 @@ export default function PageEtatDesLieux({ params }: { params: Promise<{ id: str
             <Button asChild variant="outline">
               <Link href={`/etats-des-lieux/${id}/recapitulatif`}>Relire et signer</Link>
             </Button>
+            <SuppressionEdl idEdl={id} nombrePieces={edl.pieces.length} />
           </>
         )}
 

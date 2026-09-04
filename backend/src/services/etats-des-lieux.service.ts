@@ -1,4 +1,6 @@
+import { DeleteObjectsCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { prisma } from '../lib/prisma';
+import { s3, S3_BUCKET } from '../lib/s3';
 import { Prisma } from '../../generated/prisma';
 import {
   CreationEdlInput,
@@ -223,4 +225,62 @@ export async function listerEdl(idBailleur: string, query: ListeEdlQuery) {
       totalPages: Math.ceil(total / limite),
     },
   };
+}
+
+/*
+ * Suppression d'un état des lieux (RG16) : la cascade en base emporte pièces,
+ * éléments, photos et signatures ; les fichiers du stockage objet, eux, ne sont
+ * pas concernés par les clés étrangères et doivent être purgés explicitement.
+ *
+ * Un état des lieux signé n'est pas supprimable : il est verrouillé (RG12) et
+ * constitue une preuve remise aux deux parties. Il disparaîtra avec son bien ou
+ * avec le compte, au titre du droit à l'effacement.
+ */
+export async function supprimerEdl(idBailleur: string, idEdl: string) {
+  const edl = await prisma.etatDesLieux.findFirst({
+    where: { idEdl, bien: { idBailleur } },
+    select: { idEdl: true, statut: true, idLocataire: true },
+  });
+
+  if (!edl) return { type: 'introuvable' as const };
+  if (edl.statut === 'signe') return { type: 'verrouille' as const };
+
+  await prisma.etatDesLieux.delete({ where: { idEdl } });
+
+  // Le locataire n'est rattaché à aucune autre visite : le conserver reviendrait
+  // à garder des données personnelles sans finalité.
+  const autresEdl = await prisma.etatDesLieux.count({ where: { idLocataire: edl.idLocataire } });
+  if (autresEdl === 0) {
+    await prisma.locataire.delete({ where: { idLocataire: edl.idLocataire } }).catch(() => {});
+  }
+
+  try {
+    const cles: string[] = [];
+    let suite: string | undefined;
+    do {
+      const page = await s3.send(
+        new ListObjectsV2Command({
+          Bucket: S3_BUCKET,
+          Prefix: `edl/${idEdl}/`,
+          ContinuationToken: suite,
+        }),
+      );
+      for (const objet of page.Contents ?? []) if (objet.Key) cles.push(objet.Key);
+      suite = page.NextContinuationToken;
+    } while (suite);
+
+    for (let i = 0; i < cles.length; i += 1000) {
+      await s3.send(
+        new DeleteObjectsCommand({
+          Bucket: S3_BUCKET,
+          Delete: { Objects: cles.slice(i, i + 1000).map((Key) => ({ Key })) },
+        }),
+      );
+    }
+  } catch (err) {
+    // La ligne est supprimée : on ne rejoue pas l'échec du stockage à l'appelant.
+    console.error('Erreur de purge du stockage objet :', err);
+  }
+
+  return { type: 'ok' as const };
 }

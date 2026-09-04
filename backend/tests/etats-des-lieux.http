@@ -62,3 +62,12 @@ GET {{baseUrl}}/etats-des-lieux?statut=brouillon&limite=1
 
 ### Statut inconnu → attendu 400 "Paramètres invalides"
 GET {{baseUrl}}/etats-des-lieux?statut=nimporte
+
+### Abandonner un état des lieux en brouillon (RG16) → attendu 204
+### Supprime en cascade pièces, éléments, photos et signatures, purge les fichiers
+### du stockage objet, et efface le locataire s'il n'est rattaché à aucun autre EDL.
+DELETE {{baseUrl}}/etats-des-lieux/{{entree.response.body.idEdl}}
+
+### Supprimer un état des lieux signé → attendu 409 (verrouillé, RG12)
+DELETE {{baseUrl}}/etats-des-lieux/{{entree.response.body.idEdl}}
+
