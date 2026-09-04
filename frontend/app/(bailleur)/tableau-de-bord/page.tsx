@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { PastilleStatutEdl } from "@/components/edl/pastille-etat";
+import { Button } from "@/components/ui/button";
 import { Message } from "@/components/ui/message";
 import { api } from "@/lib/api";
 import {
@@ -86,10 +87,19 @@ export default function PageTableauDeBord() {
         ) : null}
 
         {recents?.length === 0 ? (
-          <Message ton="information">
-            Aucun état des lieux pour l&apos;instant. Commencez par ajouter un bien, puis créez
-            votre premier état des lieux.
-          </Message>
+          <div className="flex flex-col items-start gap-4">
+            <Message ton="information">
+              Aucun état des lieux pour l&apos;instant.{" "}
+              {indicateurs?.biens === 0
+                ? "Commencez par ajouter un bien."
+                : "Vos biens sont prêts : lancez votre premier état des lieux."}
+            </Message>
+            <Button asChild>
+              <Link href={indicateurs?.biens === 0 ? "/biens/nouveau" : "/etats-des-lieux/nouveau"}>
+                {indicateurs?.biens === 0 ? "Ajouter un bien" : "Créer un état des lieux"}
+              </Link>
+            </Button>
+          </div>
         ) : null}
 
         {recents && recents.length > 0 ? (

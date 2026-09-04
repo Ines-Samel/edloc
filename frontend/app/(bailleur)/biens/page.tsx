@@ -99,22 +99,37 @@ export default function PageBiens() {
       ) : null}
 
       {biens?.length === 0 ? (
-        <Message ton="information">
-          {recherche || commune
-            ? "Aucun bien ne correspond à cette recherche."
-            : "Vous n'avez pas encore de bien. Ajoutez-en un pour commencer."}
-        </Message>
+        <div className="flex flex-col items-start gap-4">
+          <Message ton="information">
+            {recherche || commune
+              ? "Aucun bien ne correspond à cette recherche."
+              : "Vous n'avez pas encore de bien. Ajoutez votre premier logement : vous pourrez ensuite y créer un état des lieux."}
+          </Message>
+          {!recherche && !commune ? (
+            <Button asChild>
+              <Link href="/biens/nouveau">
+                <Plus aria-hidden className="size-4" />
+                Ajouter mon premier bien
+              </Link>
+            </Button>
+          ) : null}
+        </div>
       ) : null}
 
       {biens && biens.length > 0 ? (
         <ul className="grid gap-4 sm:grid-cols-2">
           {biens.map((bien) => {
             const { completude, libelle } = avancementBien(bien);
+            const sansEtatDesLieux = bien.nombreEdl === 0;
+
             return (
-              <li key={bien.idBien}>
+              <li
+                key={bien.idBien}
+                className="flex flex-col gap-4 rounded-carte border border-sable bg-card px-5 py-4"
+              >
                 <Link
                   href={`/biens/${bien.idBien}/historique`}
-                  className="flex min-h-cible items-center justify-between gap-4 rounded-carte border border-sable bg-card px-5 py-4 hover:border-terracotta-fonce"
+                  className="flex items-center justify-between gap-4"
                 >
                   <span className="flex flex-col gap-2">
                     <span className="text-sous-titre">{bien.adresse}</span>
@@ -123,11 +138,29 @@ export default function PageBiens() {
                   </span>
                   <ChevronRight aria-hidden className="size-5 shrink-0 text-brun" />
                 </Link>
+
+                {/* Un bien sans état des lieux ne sert à rien : on propose l'étape
+                    suivante directement sur sa carte plutôt que de compter sur
+                    l'utilisateur pour trouver l'entrée « Créer un EDL ». */}
+                <Button
+                  asChild
+                  size="sm"
+                  variant={sansEtatDesLieux ? "default" : "outline"}
+                  className="w-full"
+                >
+                  <Link href={`/etats-des-lieux/nouveau?idBien=${bien.idBien}`}>
+                    <Plus aria-hidden className="size-4" />
+                    {sansEtatDesLieux
+                      ? "Créer le premier état des lieux"
+                      : "Créer un état des lieux"}
+                  </Link>
+                </Button>
               </li>
             );
           })}
         </ul>
       ) : null}
+
     </div>
   );
 }

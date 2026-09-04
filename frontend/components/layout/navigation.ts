@@ -13,7 +13,7 @@ export type EntreeNavigation = {
 export const ENTREES_BAILLEUR: EntreeNavigation[] = [
   { href: "/tableau-de-bord", libelle: "Tableau de bord", court: "Accueil", icone: House },
   { href: "/biens", libelle: "Mes biens", court: "Biens", icone: Building2 },
-  { href: "/etats-des-lieux/nouveau", libelle: "Nouvel EDL", court: "Nouveau", icone: PlusCircle },
+  { href: "/etats-des-lieux/nouveau", libelle: "Créer un EDL", court: "Créer", icone: PlusCircle },
   { href: "/historique", libelle: "Historique", court: "Historique", icone: Clock },
   { href: "/compte", libelle: "Mon compte", court: "Compte", icone: User },
 ];
