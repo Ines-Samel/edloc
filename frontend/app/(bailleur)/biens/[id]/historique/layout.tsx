@@ -1,0 +1,12 @@
+import type { Metadata } from "next";
+
+// Titre propre à la page : les composants client ne peuvent pas exporter de
+// metadata, c'est donc le layout du segment qui le porte.
+export const metadata: Metadata = {
+  title: "Historique du bien — EDLoc",
+  description: "Les états des lieux de ce logement.",
+};
+
+export default function LayoutHistorique({ children }: { children: React.ReactNode }) {
+  return children;
+}

@@ -6,6 +6,7 @@ import {
   modifierEdl,
   listerEdlParBien,
   listerEdl,
+  supprimerEdl,
 } from '../services/etats-des-lieux.service';
 import { comparer as comparerEdl } from '../services/comparaison.service';
 import {
@@ -122,4 +123,26 @@ export async function comparer(req: Request, res: Response): Promise<void> {
     return;
   }
   res.status(200).json(resultat.comparaison);
+}
+
+export async function supprimer(req: Request, res: Response): Promise<void> {
+  const id = req.params.id as string;
+  if (!estUUID(id)) {
+    res.status(404).json({ erreur: 'Ressource introuvable' });
+    return;
+  }
+  const idBailleur = req.utilisateur!.sub;
+  const resultat = await supprimerEdl(idBailleur, id);
+
+  if (resultat.type === 'introuvable') {
+    res.status(404).json({ erreur: 'Ressource introuvable' });
+    return;
+  }
+  if (resultat.type === 'verrouille') {
+    res.status(409).json({
+      erreur: "Cet état des lieux est signé : il ne peut plus être supprimé",
+    });
+    return;
+  }
+  res.status(204).send();
 }
