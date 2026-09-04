@@ -14,6 +14,7 @@ import {
   obtenir,
   modifier,
   comparer,
+  supprimer,
 } from '../controllers/etats-des-lieux.controller';
 import { ajouter as ajouterPiece } from '../controllers/pieces.controller';
 import { signerEdl, telechargerPdf, renvoyer } from '../controllers/signatures.controller';
@@ -26,6 +27,7 @@ etatsDesLieuxRoutes.get('/', validerQuery(listeEdlQuerySchema), lister);
 etatsDesLieuxRoutes.post('/', valider(creationEdlSchema), creer);
 etatsDesLieuxRoutes.get('/:id', obtenir);
 etatsDesLieuxRoutes.patch('/:id', valider(modificationEdlSchema), modifier);
+etatsDesLieuxRoutes.delete('/:id', supprimer);
 etatsDesLieuxRoutes.post('/:id/pieces', valider(pieceSchema), ajouterPiece);
 etatsDesLieuxRoutes.post('/:id/signatures', valider(signatureSchema), signerEdl);
 etatsDesLieuxRoutes.get('/:id/pdf', telechargerPdf);

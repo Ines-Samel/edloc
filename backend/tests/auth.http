@@ -1,5 +1,10 @@
 @baseUrl = http://localhost:4000/api
 
+### Authentification par cookie httpOnly : il n'y a plus d'en-tête Authorization.
+### L'extension REST Client conserve le cookie posé par la connexion et le rejoue
+### automatiquement. Exécuter d'abord la requête de connexion ci-dessous ; un seul
+### compte peut être connecté à la fois, le cookie étant remplacé à chaque connexion.
+
 ### 1. Inscription → attendu 202 + message générique (aucune donnée de compte en réponse)
 POST {{baseUrl}}/auth/inscription
 Content-Type: application/json
@@ -69,7 +74,7 @@ Content-Type: application/json
   "email": "camille@test.fr"
 }
 
-### 8. Connexion bailleur après confirmation → attendu 200 { jeton, role: "bailleur" }
+### 8. Connexion bailleur après confirmation → attendu 200 { role: "bailleur" } + cookie de session
 # @name connexionBailleur
 POST {{baseUrl}}/auth/connexion
 Content-Type: application/json
@@ -88,7 +93,7 @@ Content-Type: application/json
   "motDePasse": "MauvaisMotDePasse1"
 }
 
-### 10. Connexion administrateur (lit ton .env) → attendu 200 { jeton, role: "administrateur" }
+### 10. Connexion administrateur (lit ton .env) → attendu 200 { role: "administrateur" } + cookie de session
 POST {{baseUrl}}/auth/connexion
 Content-Type: application/json
 
@@ -141,7 +146,7 @@ Content-Type: application/json
   "motDePasse": "MotDePasseTest12"
 }
 
-### 16. Connexion avec le nouveau mot de passe → attendu 200 { jeton, role: "bailleur" }
+### 16. Connexion avec le nouveau mot de passe → attendu 200 { role: "bailleur" } + cookie de session
 POST {{baseUrl}}/auth/connexion
 Content-Type: application/json
 
@@ -152,7 +157,12 @@ Content-Type: application/json
 
 ### 17a. Profil avec le jeton du test 8 → attendu 200 { id, nom, prenom, email, role }
 GET {{baseUrl}}/auth/me
-Authorization: Bearer {{connexionBailleur.response.body.jeton}}
 
 ### 17b. Profil sans jeton → attendu 401 "Authentification requise"
+GET {{baseUrl}}/auth/me
+
+### 18. Déconnexion → attendu 204, le cookie de session est effacé
+POST {{baseUrl}}/auth/deconnexion
+
+### 19. Profil après déconnexion → attendu 401 "Authentification requise"
 GET {{baseUrl}}/auth/me

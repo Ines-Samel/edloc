@@ -1,6 +1,11 @@
 @baseUrl = http://localhost:4000/api
 
-### 0. Connexion bailleur (compte confirmé) → fournit le jeton des appels suivants
+### Authentification par cookie httpOnly : il n'y a plus d'en-tête Authorization.
+### L'extension REST Client conserve le cookie posé par la connexion et le rejoue
+### automatiquement. Exécuter d'abord la requête de connexion ci-dessous ; un seul
+### compte peut être connecté à la fois, le cookie étant remplacé à chaque connexion.
+
+### 0. Connexion bailleur (compte confirmé) → pose le cookie utilisé par les appels suivants
 # @name connexionBailleur
 POST {{baseUrl}}/auth/connexion
 Content-Type: application/json
@@ -10,11 +15,8 @@ Content-Type: application/json
   "motDePasse": "MotDePasseTest12"
 }
 
-@jeton = {{connexionBailleur.response.body.jeton}}
-
 ### 1. Consulter son profil → attendu 200 (sans le mot de passe haché)
 GET {{baseUrl}}/compte
-Authorization: Bearer {{jeton}}
 
 ### 2. Sans jeton → attendu 401 "Authentification requise"
 GET {{baseUrl}}/compte
@@ -31,11 +33,9 @@ Content-Type: application/json
 
 ###
 GET {{baseUrl}}/compte
-Authorization: Bearer {{connexionAdmin.response.body.jeton}}
 
 ### 4. Modifier son profil sans toucher à l'e-mail → attendu 200, emailAConfirmer: false
 PUT {{baseUrl}}/compte
-Authorization: Bearer {{jeton}}
 Content-Type: application/json
 
 {
@@ -47,7 +47,6 @@ Content-Type: application/json
 
 ### 5. Adresse déjà utilisée (autre bailleur ou administrateur) → attendu 409
 PUT {{baseUrl}}/compte
-Authorization: Bearer {{jeton}}
 Content-Type: application/json
 
 {
@@ -60,7 +59,6 @@ Content-Type: application/json
 ### Le compte repasse à emailVerifie = false et un e-mail de confirmation part vers la nouvelle adresse :
 ### la connexion est refusée (403) tant que le lien n'est pas ouvert (RG17).
 PUT {{baseUrl}}/compte
-Authorization: Bearer {{jeton}}
 Content-Type: application/json
 
 {
@@ -72,7 +70,6 @@ Content-Type: application/json
 
 ### 7. Mot de passe actuel erroné → attendu 403 "Mot de passe actuel incorrect"
 PUT {{baseUrl}}/compte/mot-de-passe
-Authorization: Bearer {{jeton}}
 Content-Type: application/json
 
 {
@@ -82,7 +79,6 @@ Content-Type: application/json
 
 ### 8. Nouveau mot de passe de 6 caractères → attendu 400 "Données invalides"
 PUT {{baseUrl}}/compte/mot-de-passe
-Authorization: Bearer {{jeton}}
 Content-Type: application/json
 
 {
@@ -92,7 +88,6 @@ Content-Type: application/json
 
 ### 9. Changer son mot de passe → attendu 200 (les demandes de réinitialisation en cours sont annulées)
 PUT {{baseUrl}}/compte/mot-de-passe
-Authorization: Bearer {{jeton}}
 Content-Type: application/json
 
 {
@@ -102,18 +97,15 @@ Content-Type: application/json
 
 ### 10. Export RGPD → attendu 200, JSON en pièce jointe (edloc-mes-donnees.json)
 GET {{baseUrl}}/compte/export
-Authorization: Bearer {{jeton}}
 
 ### 11. Suppression sans mot de passe → attendu 400 "Données invalides"
 DELETE {{baseUrl}}/compte
-Authorization: Bearer {{jeton}}
 Content-Type: application/json
 
 {}
 
 ### 12. Suppression avec un mot de passe erroné → attendu 403 "Mot de passe incorrect"
 DELETE {{baseUrl}}/compte
-Authorization: Bearer {{jeton}}
 Content-Type: application/json
 
 {
@@ -124,7 +116,6 @@ Content-Type: application/json
 ### Efface en cascade biens, états des lieux, pièces, éléments, photos et signatures,
 ### ainsi que les fichiers correspondants du stockage objet.
 DELETE {{baseUrl}}/compte
-Authorization: Bearer {{jeton}}
 Content-Type: application/json
 
 {
