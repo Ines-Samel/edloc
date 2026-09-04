@@ -203,12 +203,12 @@ export async function genererEtStockerPdf(idEdl: string): Promise<string> {
 
   // Les relevés de compteurs, s'ils ont été saisis, sont remontés en en-tête.
   const pieceCompteurs = edl.pieces.find((p) => p.libelle.trim().toLowerCase() === 'compteurs');
-  const releves = pieceCompteurs?.elements
-    .map((e) => {
-      const nom = e.libelle.replace(/^Compteur\s+/i, '');
-      return [nom.charAt(0).toUpperCase() + nom.slice(1), e.commentaire].filter(Boolean).join(' ');
-    })
-    .join(' · ');
+  const releves =
+    pieceCompteurs?.elements.map((e) => {
+      const nom = e.libelle.replace(/^Compteur\s+/i, '').trim();
+      const intitule = nom.charAt(0).toUpperCase() + nom.slice(1);
+      return e.commentaire ? `${intitule} : ${e.commentaire}` : `${intitule} : non relevé`;
+    }) ?? [];
 
   const pdfBuffer = await new Promise<Buffer>((resolve) => {
     const doc = new PDFDocument({ size: 'A4', margin: MARGE, bufferPages: true });
@@ -281,19 +281,39 @@ export async function genererEtStockerPdf(idEdl: string): Promise<string> {
     // ---- Parties, type et compteurs, en cartes ----
     const largeurColonne = (LARGEUR_UTILE - 14) / 2;
 
-    const carteInfo = (x: number, yCarte: number, titre: string, lignes: string[], hauteur: number) => {
+    // Hauteur nécessaire à une carte : en-tête, lignes mesurées, marge basse.
+    const hauteurCarte = (lignes: string[], premiereEnGras: boolean) => {
+      let hauteur = 26;
+      lignes.forEach((ligne, index) => {
+        const gras = premiereEnGras && index === 0;
+        doc.font(gras ? 'Helvetica-Bold' : 'Helvetica').fontSize(gras ? 10.5 : 8.5);
+        hauteur += doc.heightOfString(ligne, { width: largeurColonne - 24 }) + 3;
+      });
+      return hauteur + 9;
+    };
+
+    const carteInfo = (
+      x: number,
+      yCarte: number,
+      titre: string,
+      lignes: string[],
+      hauteur: number,
+      premiereEnGras = true,
+    ) => {
       carte(doc, x, yCarte, largeurColonne, hauteur, { fond: COULEURS.blanc });
       doc
         .font('Helvetica-Bold')
         .fontSize(7.5)
         .fillColor(COULEURS.terracottaFonce)
         .text(titre.toUpperCase(), x + 12, yCarte + 11, { width: largeurColonne - 24 });
+
       let yLigne = yCarte + 26;
       lignes.forEach((ligne, index) => {
+        const gras = premiereEnGras && index === 0;
         doc
-          .font(index === 0 ? 'Helvetica-Bold' : 'Helvetica')
-          .fontSize(index === 0 ? 10.5 : 8.5)
-          .fillColor(index === 0 ? COULEURS.encre : COULEURS.brun)
+          .font(gras ? 'Helvetica-Bold' : 'Helvetica')
+          .fontSize(gras ? 10.5 : 8.5)
+          .fillColor(gras ? COULEURS.encre : COULEURS.brun)
           .text(ligne, x + 12, yLigne, { width: largeurColonne - 24 });
         yLigne = doc.y + 3;
       });
@@ -305,34 +325,39 @@ export async function genererEtStockerPdf(idEdl: string): Promise<string> {
       .filter(Boolean)
       .join(' · ');
 
-    placePour(80);
-    carteInfo(MARGE, y, 'Bailleur', [`${bailleur.prenom} ${bailleur.nom}`, contactBailleur], 58);
-    carteInfo(
-      MARGE + largeurColonne + 14,
-      y,
-      'Locataire',
-      [`${edl.locataire.prenom} ${edl.locataire.nom}`, contactLocataire || '—'],
-      58,
+    const lignesBailleur = [`${bailleur.prenom} ${bailleur.nom}`, contactBailleur || '—'];
+    const lignesLocataire = [
+      `${edl.locataire.prenom} ${edl.locataire.nom}`,
+      contactLocataire || '—',
+    ];
+    const hauteurRangee1 = Math.max(
+      hauteurCarte(lignesBailleur, true),
+      hauteurCarte(lignesLocataire, true),
     );
-    y += 68;
 
-    const hauteurSeconde = releves ? 62 : 48;
-    placePour(hauteurSeconde + 40);
-    carteInfo(
-      MARGE,
-      y,
-      "Type d'état des lieux",
-      [edl.typeEdl === 'entree' ? 'Entrée' : 'Sortie'],
-      hauteurSeconde,
+    placePour(hauteurRangee1 + 20);
+    carteInfo(MARGE, y, 'Bailleur', lignesBailleur, hauteurRangee1);
+    carteInfo(MARGE + largeurColonne + 14, y, 'Locataire', lignesLocataire, hauteurRangee1);
+    y += hauteurRangee1 + 12;
+
+    const lignesType = [edl.typeEdl === 'entree' ? 'Entrée' : 'Sortie'];
+    const lignesCompteurs = releves.length > 0 ? releves : ['Non renseignés'];
+    const hauteurRangee2 = Math.max(
+      hauteurCarte(lignesType, true),
+      hauteurCarte(lignesCompteurs, false),
     );
+
+    placePour(hauteurRangee2 + 40);
+    carteInfo(MARGE, y, "Type d'état des lieux", lignesType, hauteurRangee2);
     carteInfo(
       MARGE + largeurColonne + 14,
       y,
       'Compteurs relevés',
-      [releves || 'Non renseignés'],
-      hauteurSeconde,
+      lignesCompteurs,
+      hauteurRangee2,
+      false,
     );
-    y += hauteurSeconde + 12;
+    y += hauteurRangee2 + 12;
 
     // ---- Légende ----
     placePour(40);
